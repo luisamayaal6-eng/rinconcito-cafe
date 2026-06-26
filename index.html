@@ -1118,7 +1118,12 @@ const SDM_REC_DELETED_DEFAULT=[
   {p:"Sandwich de Jamón de Pavo Sencillo",i:"Pan Integral"},
   {p:"Sandwich de Pollo Doble",i:"Pan Integral"},
   {p:"Sandwich de Pollo Sencillo",i:"Pan Integral"},
-  {p:"Saint Honoré",i:"Saint Honoré"}
+  {p:"Saint Honoré",i:"Saint Honoré"},
+  {p:"Frozen Chai 16 OZ",i:"Cup Chai"},{p:"Frozen Chai 20 OZ",i:"Cup Chai"},
+  {p:"Ice Chai 16 OZ",i:"Cup Chai"},{p:"Ice Chai 20 OZ",i:"Cup Chai"},
+  {p:"Latte Chai",i:"Cup Chai"},{p:"Té Chai 12 OZ",i:"Cup Chai"},{p:"Té de Taro",i:"Cup Chai"},
+  {p:"Té Matcha",i:"Cup De Matcha"},
+  {p:"Té Infusiones",i:"Te Infusiones"}
 ];
 // SDM: Pasta De Pollo (OZ→UNIDAD), Sorbete (renombrado), Cheese Cake De Nutella (renombrado), Pan Integral (cantidad corregida)
 const SDM_REC_CUSTOM_DEFAULT=[
@@ -1164,7 +1169,13 @@ const SDM_REC_CUSTOM_DEFAULT=[
   {p:"Sandwich de Jamón de Pavo Doble",i:"Pan Integral",c:4.0,u:"LASCA"},
   {p:"Sandwich de Jamón de Pavo Sencillo",i:"Pan Integral",c:2.0,u:"LASCA"},
   {p:"Sandwich de Pollo Doble",i:"Pan Integral",c:4.0,u:"LASCA"},
-  {p:"Sandwich de Pollo Sencillo",i:"Pan Integral",c:2.0,u:"LASCA"}
+  {p:"Sandwich de Pollo Sencillo",i:"Pan Integral",c:2.0,u:"LASCA"},
+  {p:"Frozen Chai 16 OZ",i:"Chai",c:45.0,u:"GR"},{p:"Frozen Chai 20 OZ",i:"Chai",c:56.25,u:"GR"},
+  {p:"Ice Chai 16 OZ",i:"Chai",c:10.0,u:"GR"},{p:"Ice Chai 20 OZ",i:"Chai",c:12.5,u:"GR"},
+  {p:"Latte Chai",i:"Chai",c:30.0,u:"GR"},{p:"Té Chai 12 OZ",i:"Chai",c:30.0,u:"GR"},
+  {p:"Té de Taro",i:"Chai",c:1.5,u:"unidad"},
+  {p:"Té Matcha",i:"Matcha",c:30.0,u:"gramos"},
+  {p:"Té Infusiones",i:"Te Infusion",c:3.0,u:"GR"}
 ];
 
 // ── Firebase ───────────────────────────────────────────────
@@ -1239,6 +1250,243 @@ const SDM_INV_REMOVE=[
   "Cerezas","Chia","Crema Batida","Nutella","Picsis Decoracion","Espinaca","Bobas",
   "Jelle","Jarabe","Cilantro","Bolsas de Fruta Seca","Botella de Vino","Saint Honoré",
 ];
+// 65 ítems confirmados por Luis para eliminar del inventario de Capistrano por nombre (no aplica a SDM)
+// (4 casos ambiguos -café especialidad, Te Infusiones, jugo de limon, Ensalada De Papa- se manejan
+// aparte por coincidencia EXACTA, ya que su versión normalizada es idéntica a la del ítem que se mantiene)
+const CAP_INV_REMOVE=[
+  "1 Bolsa De Coco","1 botella de vino","Aceite De Oliva","Aioli","Arugula",
+  "Azucar 4 Bolsas (5 Lbs C/U)","Azucar 4 Bolsas (5 Lbs C/u)","Baileys","Baileys 7 Oz","Blueberry",
+  "Bobas","Bolas De Sorbete","Bolsas de Fruta Seca","Botella Vino Blanco Frontera","Botella de Vino",
+  "Budin","Café Venta","Canela Raja","Cebolla","Cebolla Morada","Cerezas","Chile Verde","Chipotle",
+  "Cilantro","Concentrado Panela + Canela","Crema Batida","Dijon","Dry Bin 5OZ","Dry Bin 5Oz",
+  "Dulce Panela","Espinaca","Galleta Oreo","Heinekken","Hershy Caramelo",
+  "Hershy Chocolate","Hershy Fresa","Hielo","Jarabe","Jelle","Jengibre","Leche Almendra","Lechuga",
+  "Limón","Nutella","Pan Ciabatta","Papa","Pepino","Pesto De Albahaca","Picsis Decoracion",
+  "Pimienta Gorda","Rompope + Canela","Saint Honoré","Salsa Barbacoa","Smirnoff","Te De Manzanilla",
+  "Te Durazno","Te Eleccion","Te Pepermint","Te Roobios Peach","Te Verde Rosas",
+  "Tomate De Cocina","Tomate Manzano","Zanahoria","jarabe","Cheese Cake De Fresa",
+];
+// Casos donde el nombre normalizado es idéntico al del ítem que se mantiene — se borran por coincidencia EXACTA
+const CAP_INV_REMOVE_EXACT=[
+  {n:"café especialidad"},
+  {n:"Te Infusiones",u:"GRAMOS"},
+  {n:"jugo de limon"},
+  {n:"Ensalada De Papa"},
+];
+// Recetas de Capistrano: ingredientes eliminados sin reemplazo (Aioli, Arugula, Lechuga, etc.)
+const CAP_REC_DELETED_DEFAULT=[
+  {p:"Ciabatta de Jamón de Pavo",i:"Lechuga"},
+  {p:"Ciabatta de Pollo",i:"Lechuga"},
+  {p:"Hamburguesa de Pollo Doble",i:"Lechuga"},
+  {p:"Hamburguesa de Pollo Sencilla",i:"Lechuga"},
+  {p:"Hamburguesa de Res Barbacoa Doble",i:"Lechuga"},
+  {p:"Hamburguesa de Res Barbacoa Sencilla",i:"Lechuga"},
+  {p:"Hamburguesa de Res Chipotle Doble",i:"Lechuga"},
+  {p:"Hamburguesa de Res Doble",i:"Lechuga"},
+  {p:"Hamburguesa de Res Hawaiana Doble",i:"Lechuga"},
+  {p:"Hamburguesa de Res Hawaiana Sencilla",i:"Lechuga"},
+  {p:"Panini Chicken Chipotle",i:"Lechuga"},
+  {p:"Pollo A la Plancha",i:"Lechuga"},
+  {p:"Promo Hamburguesa de Res Sencilla + Papas $6",i:"Lechuga"},
+  {p:"Sandwich de Atún Doble",i:"Lechuga"},
+  {p:"Sandwich de Atún Sencillo",i:"Lechuga"},
+  {p:"Sandwich de Jamón de Pavo Doble",i:"Lechuga"},
+  {p:"Sandwich de Jamón de Pavo Sencillo",i:"Lechuga"},
+  {p:"Sandwich de Pollo Doble",i:"Lechuga"},
+  {p:"Sandwich de Pollo Sencillo",i:"Lechuga"},
+  {p:"Hamburguesa Evento Infantil",i:"Lechuga"},
+  {p:"Hamburguesa Mini Evento",i:"Lechuga"},
+  {p:"Club Sandwich",i:"Aioli"},
+  {p:"Hamburguesa de Pollo Doble",i:"Aioli"},
+  {p:"Hamburguesa de Pollo Sencilla",i:"Aioli"},
+  {p:"Hamburguesa de Res Doble",i:"Aioli"},
+  {p:"Hamburguesa de Res Sencilla",i:"Aioli"},
+  {p:"Pollo A la Plancha",i:"Aioli"},
+  {p:"Promo Hamburguesa de Res Sencilla + Papas $6",i:"Aioli"},
+  {p:"Hamburguesa Evento Infantil",i:"Aioli"},
+  {p:"Hamburguesa Mini Evento",i:"Aioli"},
+  {p:"Ciabatta de Jamón de Pavo",i:"Arugula"},
+  {p:"Ciabatta de Pollo",i:"Arugula"},
+  {p:"Hamburguesa de Pollo Doble",i:"Arugula"},
+  {p:"Hamburguesa de Pollo Sencilla",i:"Arugula"},
+  {p:"Hamburguesa de Res Barbacoa Doble",i:"Arugula"},
+  {p:"Hamburguesa de Res Barbacoa Sencilla",i:"Arugula"},
+  {p:"Hamburguesa de Res Chipotle Doble",i:"Arugula"},
+  {p:"Hamburguesa de Res Chipotle Sencilla",i:"Arugula"},
+  {p:"Hamburguesa de Res Doble",i:"Arugula"},
+  {p:"Hamburguesa de Res Hawaiana Doble",i:"Arugula"},
+  {p:"Hamburguesa de Res Hawaiana Sencilla",i:"Arugula"},
+  {p:"Hamburguesa de Res Sencilla",i:"Arugula"},
+  {p:"Panini Chicken Chipotle",i:"Arugula"},
+  {p:"Sandwich Capresse",i:"Arugula"},
+  {p:"Sandwich de Atún Doble",i:"Arugula"},
+  {p:"Sandwich de Atún Sencillo",i:"Arugula"},
+  {p:"Sandwich de Jamón de Pavo Doble",i:"Arugula"},
+  {p:"Sandwich de Jamón de Pavo Sencillo",i:"Arugula"},
+  {p:"Sandwich de Pollo Doble",i:"Arugula"},
+  {p:"Sandwich de Pollo Sencillo",i:"Arugula"},
+  {p:"Hamburguesa de Res Barbacoa Doble",i:"Salsa Barbacoa"},
+  {p:"Hamburguesa de Res Barbacoa Sencilla",i:"Salsa Barbacoa"},
+  {p:"Frozen Fruta y Agua 16 OZ",i:"Hielo"},
+  {p:"Frozen Fruta y Agua 20 OZ",i:"Hielo"},
+  {p:"Ice Latte 16 OZ",i:"Hielo"},
+  {p:"Crepa de Nutella Banano",i:"Nutella"},
+  {p:"Promo 2x 1 Crepa de Nutella Banano",i:"Nutella"},
+  {p:"Cheesecake de Fresa",i:"Cheese Cake de Fresa"},
+  {p:"Ciabatta de Jamón de Pavo",i:"Cebolla Morada"},
+  {p:"Ciabatta de Jamón de Pavo",i:"Dijon"},
+  {p:"Ciabatta de Jamón de Pavo",i:"Pan Ciabatta"},
+  {p:"Ciabatta de Jamón de Pavo",i:"Tomate Manzano"},
+  {p:"Ciabatta de Pollo",i:"Cebolla Morada"},
+  {p:"Ciabatta de Pollo",i:"Dijon"},
+  {p:"Ciabatta de Pollo",i:"Pan Ciabatta"},
+  {p:"Ciabatta de Pollo",i:"Tomate Manzano"},
+  {p:"Club Sandwich",i:"Cebolla"},
+  {p:"Club Sandwich",i:"Espinaca"},
+  {p:"Club Sandwich",i:"Pepino"},
+  {p:"Club Sandwich",i:"Tomate Manzano"},
+  {p:"Ensalada de Papa",i:"Ensalada de Papa"},
+  {p:"Frozen Fruta y Yogurt 16 OZ",i:"Baileys"},
+  {p:"Frozen Fruta y Yogurt 20 OZ",i:"Baileys"},
+  {p:"Hamburguesa de Pollo Doble",i:"Cebolla Morada"},
+  {p:"Hamburguesa de Pollo Doble",i:"Pepino"},
+  {p:"Hamburguesa de Pollo Doble",i:"Tomate Manzano"},
+  {p:"Hamburguesa de Pollo Sencilla",i:"Cebolla Morada"},
+  {p:"Hamburguesa de Pollo Sencilla",i:"Pepino"},
+  {p:"Hamburguesa de Pollo Sencilla",i:"Tomate Manzano"},
+  {p:"Hamburguesa de Res Barbacoa Doble",i:"Cebolla"},
+  {p:"Hamburguesa de Res Barbacoa Doble",i:"Pepino"},
+  {p:"Hamburguesa de Res Barbacoa Doble",i:"Tomate Manzano"},
+  {p:"Hamburguesa de Res Barbacoa Sencilla",i:"Cebolla"},
+  {p:"Hamburguesa de Res Barbacoa Sencilla",i:"Pepino"},
+  {p:"Hamburguesa de Res Barbacoa Sencilla",i:"Tomate Manzano"},
+  {p:"Hamburguesa de Res Chipotle Doble",i:"Cebolla Morada"},
+  {p:"Hamburguesa de Res Chipotle Doble",i:"Chipotle"},
+  {p:"Hamburguesa de Res Chipotle Doble",i:"Pepino"},
+  {p:"Hamburguesa de Res Chipotle Doble",i:"Tomate Manzano"},
+  {p:"Hamburguesa de Res Chipotle Sencilla",i:"Tomate Manzano"},
+  {p:"Hamburguesa de Res Doble",i:"Cebolla Morada"},
+  {p:"Hamburguesa de Res Doble",i:"Pepino"},
+  {p:"Hamburguesa de Res Doble",i:"Tomate Manzano"},
+  {p:"Hamburguesa de Res Hawaiana Doble",i:"Cebolla Morada"},
+  {p:"Hamburguesa de Res Hawaiana Sencilla",i:"Cebolla Morada"},
+  {p:"Hamburguesa de Res Sencilla",i:"Cebolla Morada"},
+  {p:"Ice Baileys 16 OZ",i:"Baileys"},
+  {p:"Ice Baileys 20 OZ",i:"Baileys"},
+  {p:"Leche Almendra",i:"Leche Almendra"},
+  {p:"Milk Shake de Galleta Oreo y Nutella 16 OZ",i:"Galleta Oreo"},
+  {p:"Milk Shake de Galleta Oreo y Nutella 20 OZ",i:"Galleta Oreo"},
+  {p:"Milk Shake de Nutella 16 OZ",i:"Galleta Oreo"},
+  {p:"Milk Shake de Nutella 20 OZ",i:"Galleta Oreo"},
+  {p:"Panini Chicken Chipotle",i:"Cebolla Morada"},
+  {p:"Panini Chicken Chipotle",i:"Chipotle"},
+  {p:"Panini Chicken Chipotle",i:"Pan Ciabatta"},
+  {p:"Panini Chicken Chipotle",i:"Tomate Manzano"},
+  {p:"Pollo A la Plancha",i:"Cebolla Morada"},
+  {p:"Pollo A la Plancha",i:"Pepino"},
+  {p:"Promo Hamburguesa de Res Sencilla + Papas $6",i:"Cebolla Morada"},
+  {p:"Promo Hamburguesa de Res Sencilla + Papas $6",i:"Papa"},
+  {p:"Promo Hamburguesa de Res Sencilla + Papas $6",i:"Pepino"},
+  {p:"Promo Hamburguesa de Res Sencilla + Papas $6",i:"Tomate Manzano"},
+  {p:"Quesadilla de Pollo Chipotle",i:"Cebolla Morada"},
+  {p:"Quesadilla de Pollo Chipotle",i:"Chile Verde"},
+  {p:"Quesadilla de Pollo Chipotle",i:"Chipotle"},
+  {p:"Sandwich Capresse",i:"Cebolla Morada"},
+  {p:"Sandwich Capresse",i:"Espinaca"},
+  {p:"Sandwich Capresse",i:"Pesto de Albahaca"},
+  {p:"Sandwich Capresse",i:"Tomate Manzano"},
+  {p:"Sandwich de Atún Doble",i:"Cebolla Morada"},
+  {p:"Sandwich de Atún Doble",i:"Dijon"},
+  {p:"Sandwich de Atún Doble",i:"Tomate Manzano"},
+  {p:"Sandwich de Atún Sencillo",i:"Cebolla Morada"},
+  {p:"Sandwich de Atún Sencillo",i:"Dijon"},
+  {p:"Sandwich de Atún Sencillo",i:"Tomate Manzano"},
+  {p:"Sandwich de Jamón de Pavo Doble",i:"Dijon"},
+  {p:"Sandwich de Jamón de Pavo Doble",i:"Tomate Manzano"},
+  {p:"Sandwich de Jamón de Pavo Sencillo",i:"Dijon"},
+  {p:"Sandwich de Jamón de Pavo Sencillo",i:"Tomate Manzano"},
+  {p:"Sandwich de Pollo Doble",i:"Dijon"},
+  {p:"Sandwich de Pollo Doble",i:"Pepino"},
+  {p:"Sandwich de Pollo Doble",i:"Tomate Manzano"},
+  {p:"Sandwich de Pollo Sencillo",i:"Dijon"},
+  {p:"Sandwich de Pollo Sencillo",i:"Pepino"},
+  {p:"Sandwich de Pollo Sencillo",i:"Tomate Manzano"},
+  {p:"Shake de Galleta Oreo 16 OZ",i:"Galleta Oreo"},
+  {p:"Shake de Galleta Oreo 20 OZ",i:"Galleta Oreo"},
+  {p:"Smirnoff",i:"Smirnoff"},
+  {p:"Smoothie Fruta y Leche 20 OZ",i:"Jarabe"},
+  {p:"Promo 2x1 Heineken",i:"Heinekken"},
+  {p:"Orden de Papas",i:"Papa"},
+  {p:"Hamburguesa Evento Infantil",i:"Cebolla Morada"},
+  {p:"Hamburguesa Evento Infantil",i:"Papa"},
+  {p:"Hamburguesa Evento Infantil",i:"Pepino"},
+  {p:"Hamburguesa Evento Infantil",i:"Tomate Manzano"},
+  {p:"Hamburguesa Mini Evento",i:"Cebolla Morada"},
+  {p:"Hamburguesa Mini Evento",i:"Papa"},
+  {p:"Hamburguesa Mini Evento",i:"Pepino"},
+  {p:"Hamburguesa Mini Evento",i:"Tomate Manzano"},
+  {p:"Panini Pesto Evento Infantil",i:"Cebolla Morada"},
+  {p:"Panini Pesto Evento Infantil",i:"Pan Ciabatta"},
+  {p:"Panini Pesto Evento Infantil",i:"Pesto de Albahaca"},
+  {p:"Panini Pesto Evento Infantil",i:"Tomate Manzano"},
+  {p:"Panini Pesto Mini Evento",i:"Cebolla Morada"},
+  {p:"Panini Pesto Mini Evento",i:"Pan Ciabatta"},
+  {p:"Panini Pesto Mini Evento",i:"Pesto de Albahaca"},
+  {p:"Panini Pesto Mini Evento",i:"Tomate Manzano"},
+  {p:"Bolsas de Fruta Seca",i:"Bolsas de Fruta Seca"},
+  {p:"Bruchetta",i:"Pesto De Albahaca"},
+  {p:"Bruchetta",i:"Tomate Manzano"},
+  {p:"Café Especialidad",i:"Café especialidad"},
+  {p:"Crepa de Nutella Banano",i:"Hershy Chocolate"},
+  {p:"Crepa de Nutella Fresa",i:"Hershy Chocolate"},
+  {p:"Crepa de Nutella Fresa y Banano",i:"Hershy Chocolate"},
+  {p:"Frozen Fruta y Agua 16 OZ",i:"Jarabe"},
+  {p:"Frozen Fruta y Agua 20 OZ",i:"Jarabe"},
+  {p:"Hamburguesa de Res Chipotle Sencilla",i:"Chipotle"},
+  {p:"Hamburguesa de Res Chipotle Sencilla",i:"Cebolla Morada"},
+  {p:"Hamburguesa de Res Chipotle Sencilla",i:"Pepino"},
+  {p:"Hamburguesa de Res Hawaiana Doble",i:"Tomate Manzano"},
+  {p:"Hamburguesa de Res Hawaiana Doble",i:"Pepino"},
+  {p:"Hamburguesa de Res Sencilla",i:"Tomate Manzano"},
+  {p:"Hamburguesa de Res Sencilla",i:"Pepino"},
+  {p:"Ice Baileys 16 OZ",i:"Hershy Chocolate"},
+  {p:"Ice Baileys 20 OZ",i:"Hershy Chocolate"},
+  {p:"Ice Moca 16 OZ",i:"Hershy Chocolate"},
+  {p:"Ice Moca 20 OZ",i:"Hershy Chocolate"},
+  {p:"Ice Moca Menta 16 OZ",i:"Hershy Chocolate"},
+  {p:"Ice Moca Menta 20 OZ",i:"Hershy Chocolate"},
+  {p:"Limonada Azul",i:"Jarabe"},
+  {p:"Limonada Azul",i:"bobas"},
+  {p:"Limonada Chia",i:"Jarabe"},
+  {p:"Limonada Fresa",i:"Jarabe"},
+  {p:"Limonada Natural",i:"Jarabe"},
+  {p:"Limonada Pepino",i:"Pepino"},
+  {p:"Limonada Pepino",i:"Jarabe"},
+  {p:"Panini Chicken Al Pesto",i:"Tomate Manzano"},
+  {p:"Panini Chicken Al Pesto",i:"Cebolla Morada"},
+  {p:"Panini Chicken Al Pesto",i:"Pesto De Albahaca"},
+  {p:"Papas Fritas",i:"Papa"},
+  {p:"Promo 2x 1 Crepa de Nutella Banano",i:"Hershy Chocolate"},
+  {p:"Promo 2x 1 Crepa de Nutella Fresa",i:"Hershy Chocolate"},
+  {p:"Promo 2x 1 Crepa de Nutella Fresa y Banano",i:"Hershy Chocolate"},
+  {p:"Sandwich Capresse",i:"Pesto De Albahaca"},
+  {p:"Shake de Chocolate 16 OZ",i:"Hershy Chocolate"},
+  {p:"Shake de Chocolate 20 OZ",i:"Hershy Chocolate"},
+  {p:"Té Durazno",i:"Te Durazno"},
+  {p:"Saint Honoré",i:"Saint Honoré"},
+  {p:"Panini Pesto Evento Infantil",i:"Pesto De Albahaca"},
+  {p:"Panini Pesto Mini Evento",i:"Pesto De Albahaca"},
+  {p:"Botella de Vino",i:"Botella de Vino"}
+];
+// Recetas de Capistrano: redirecciones por fusión de duplicados (Leche Almendra→Leche de almendras, Pan Ciabatta→Pan Ciabbatta)
+const CAP_REC_CUSTOM_DEFAULT=[
+  {p:"Ciabatta de Jamón de Pavo",i:"Pan Ciabbatta",c:1.0,u:"UNIDAD"},
+  {p:"Ciabatta de Pollo",i:"Pan Ciabbatta",c:1.0,u:"UNIDAD"},
+  {p:"Leche Almendra",i:"Leche de almendras",c:2.0,u:"OZ"},
+  {p:"Panini Chicken Chipotle",i:"Pan Ciabbatta",c:1.0,u:"UNIDAD"},
+  {p:"Panini Pesto Evento Infantil",i:"Pan Ciabbatta",c:1.0,u:"UNIDAD"},
+  {p:"Panini Pesto Mini Evento",i:"Pan Ciabbatta",c:1.0,u:"UNIDAD"}
+];
 async function loadSucData(){
   const s=S.suc;
   const isSDM=s==="Salvador del Mundo";
@@ -1294,7 +1542,9 @@ async function loadSucData(){
     }
     // ── Inventario: eliminar ítems confirmados + renombrar ──────────────────
     const removeSet=new Set(SDM_INV_REMOVE.map(norm));
-    const renameMap={"bola de sorbete":"Sorbete","cheese cake de chocolate":"Cheese Cake De Nutella"};
+    const renameMap={"bola de sorbete":"Sorbete","cheese cake de chocolate":"Cheese Cake De Nutella",
+      "cup de taro":"Taro","cup de horchata":"Horchata","cheese cake de frambuesa":"Cheese Cake De Blueberry",
+      "te infusiones":"Te Infusion","cup chai":"Chai","cup de matcha":"Matcha"};
     let invChanged=false;
     const filteredInv=S.invBase.filter(it=>!removeSet.has(norm(it.n)));
     if(filteredInv.length!==S.invBase.length)invChanged=true;
@@ -1304,6 +1554,42 @@ async function loadSucData(){
       return it;
     });
     if(invChanged){S.invBase=renamedInv;saveInv();}
+  } else if(s==="Capistrano"){
+    // ── Auto-reparable: garantiza que las reglas de Capistrano se aplican aunque
+    // Firebase ya tenga datos guardados de antes de que existieran estas reglas.
+    let recChanged=false;
+    const delKeys=new Set(S.recDeleted.map(d=>d.p+"|"+d.i));
+    CAP_REC_DELETED_DEFAULT.forEach(req=>{
+      const k=req.p+"|"+req.i;
+      if(!delKeys.has(k)){S.recDeleted.push(req);delKeys.add(k);recChanged=true;}
+    });
+    const customKeys=new Set(S.recCustom.map(c=>c.p+"|"+c.i));
+    CAP_REC_CUSTOM_DEFAULT.forEach(req=>{
+      const k=req.p+"|"+req.i;
+      if(!customKeys.has(k)){S.recCustom.push(req);customKeys.add(k);recChanged=true;}
+    });
+    if(recChanged){
+      ST_set(sk(s,"recetas_deleted"),S.recDeleted);
+      ST_set(sk(s,"recetas_custom"),S.recCustom);
+    }
+    // ── Inventario: eliminar ítems confirmados (por nombre, y casos exactos) ──
+    const removeSetCap=new Set(CAP_INV_REMOVE.map(norm));
+    // Antes de filtrar, capturamos el stock de "café especialidad" para sumarlo al sobreviviente
+    const cafeEspecialidadStock=(S.invBase.find(it=>it.n==="café especialidad")||{}).s||0;
+    let invChangedCap=false;
+    let filteredCap=S.invBase.filter(it=>{
+      if(removeSetCap.has(norm(it.n))){invChangedCap=true;return false;}
+      const exactMatch=CAP_INV_REMOVE_EXACT.some(r=>it.n===r.n&&(r.u===undefined||it.u===r.u));
+      if(exactMatch){invChangedCap=true;return false;}
+      return true;
+    });
+    if(cafeEspecialidadStock>0){
+      filteredCap=filteredCap.map(it=>{
+        if(it.n==="Café Especialidad"&&it.s<cafeEspecialidadStock){invChangedCap=true;return{...it,s:cafeEspecialidadStock};}
+        return it;
+      });
+    }
+    if(invChangedCap){S.invBase=filteredCap;saveInv();}
   }
 }
 function saveMesas(){ST_set(sk(S.suc,"mesas"),S.mesas);}
