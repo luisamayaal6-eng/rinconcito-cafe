@@ -63,6 +63,13 @@ button,input,select{font-family:inherit}
 .loading{display:flex;align-items:center;justify-content:center;height:100vh;font-size:18px;color:#2C1810}
 .err{padding:10px;border-radius:8px;background:#C0392B;color:#fff;font-size:12px;font-weight:600;margin-top:8px}
 .ok{padding:10px;border-radius:8px;background:#2E7D52;color:#fff;font-size:12px;font-weight:600;margin-top:8px}
+@media print{
+  body *{visibility:hidden}
+  #resumenSemanal,#resumenSemanal *{visibility:visible}
+  #resumenSemanal{position:absolute;inset:0;background:#fff;padding:0}
+  #resumenPrint{max-height:none;overflow:visible;box-shadow:none;max-width:100%}
+  #resumenPrint button,#resumenPrint .no-print{display:none!important}
+}
 </style>
 </head>
 <body>
@@ -386,7 +393,7 @@ const INV_BASE={
     {n:"Saint Honoré",u:"UNIDAD",s:0.0}
   ]
 };
-const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Ciabatta de Pollo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Pollo Doble",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Pollo Sencilla",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Res Barbacoa Doble",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Res Barbacoa Sencilla",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Res Chipotle Doble",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Res Doble",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Res Hawaiana Doble",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Res Hawaiana Sencilla",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Panini Chicken Chipotle",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Pollo A la Plancha",i:"Lechuga",c:0.3,u:"UNIDAD"},{p:"Promo Hamburguesa de Res Sencilla + Papas $6",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Sandwich de Atún Doble",i:"Lechuga",c:0.2,u:"UNIDAD"},{p:"Sandwich de Atún Sencillo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Sandwich de Jamón de Pavo Doble",i:"Lechuga",c:0.2,u:"UNIDAD"},{p:"Sandwich de Jamón de Pavo Sencillo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Sandwich de Pollo Doble",i:"Lechuga",c:0.2,u:"UNIDAD"},{p:"Sandwich de Pollo Sencillo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa Evento Infantil",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa Mini Evento",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Club Sandwich",i:"Aioli",c:1.0,u:"OZ"},{p:"Hamburguesa de Pollo Doble",i:"Aioli",c:1.0,u:"OZ"},{p:"Hamburguesa de Pollo Sencilla",i:"Aioli",c:1.0,u:"OZ"},{p:"Hamburguesa de Res Doble",i:"Aioli",c:1.0,u:"OZ"},{p:"Hamburguesa de Res Sencilla",i:"Aioli",c:1.0,u:"OZ"},{p:"Pollo A la Plancha",i:"Aioli",c:1.0,u:"OZ"},{p:"Promo Hamburguesa de Res Sencilla + Papas $6",i:"Aioli",c:1.0,u:"OZ"},{p:"Hamburguesa Evento Infantil",i:"Aioli",c:1.0,u:"OZ"},{p:"Hamburguesa Mini Evento",i:"Aioli",c:1.0,u:"OZ"},{p:"Ciabatta de Jamón de Pavo",i:"Arugula",c:20.0,u:"gramos"},{p:"Ciabatta de Pollo",i:"Arugula",c:20.0,u:"gramos"},{p:"Hamburguesa de Pollo Doble",i:"Arugula",c:20.0,u:"gramos"},{p:"Hamburguesa de Pollo Sencilla",i:"Arugula",c:20.0,u:"gramos"},{p:"Hamburguesa de Res Barbacoa Doble",i:"Arugula",c:20.0,u:"gramos"},{p:"Hamburguesa de Res Barbacoa Sencilla",i:"Arugula",c:20.0,u:"gramos"},{p:"Hamburguesa de Res Chipotle Doble",i:"Arugula",c:20.0,u:"gramos"},{p:"Hamburguesa de Res Chipotle Sencilla",i:"Arugula",c:20.0,u:"gramos"},{p:"Hamburguesa de Res Doble",i:"Arugula",c:20.0,u:"gramos"},{p:"Hamburguesa de Res Hawaiana Doble",i:"Arugula",c:20.0,u:"unidades"},{p:"Hamburguesa de Res Hawaiana Sencilla",i:"Arugula",c:20.0,u:"gramos"},{p:"Hamburguesa de Res Sencilla",i:"Arugula",c:20.0,u:"gramos"},{p:"Panini Chicken Chipotle",i:"Arugula",c:20.0,u:"gramos"},{p:"Sandwich Capresse",i:"Arugula",c:20.0,u:"gramos"},{p:"Sandwich de Atún Doble",i:"Arugula",c:40.0,u:"gramos"},{p:"Sandwich de Atún Sencillo",i:"Arugula",c:20.0,u:"gramos"},{p:"Sandwich de Jamón de Pavo Doble",i:"Arugula",c:40.0,u:"gramos"},{p:"Sandwich de Jamón de Pavo Sencillo",i:"Arugula",c:20.0,u:"gramos"},{p:"Sandwich de Pollo Doble",i:"Arugula",c:40.0,u:"gramos"},{p:"Sandwich de Pollo Sencillo",i:"Arugula",c:20.0,u:"gramos"},{p:"Hamburguesa de Res Barbacoa Doble",i:"Salsa Barbacoa",c:1.0,u:"oz"},{p:"Hamburguesa de Res Barbacoa Sencilla",i:"Salsa Barbacoa",c:1.0,u:"oz"},{p:"Frozen Fruta y Agua 16 OZ",i:"Hielo",c:1.0,u:"UNIDAD"},{p:"Frozen Fruta y Agua 20 OZ",i:"Hielo",c:1.25,u:"UNIDAD"},{p:"Ice Latte 16 OZ",i:"Hielo",c:0.5,u:"unidad"},{p:"Crepa de Nutella Banano",i:"Nutella",c:2.0,u:"oz"},{p:"Promo 2x 1 Crepa de Nutella Banano",i:"Nutella",c:4.0,u:"OZ"},
+const REC=[{p:"Latte Chai",i:"Café",c:20.0,u:"GR"},{p:"Mini Sandwichitos",i:"Jamon",c:2.0,u:"LASCA"},{p:"Tostadas de Plátano",i:"Tostadas De Platano",c:0.5,u:"UNIDAD"},{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Ciabatta de Pollo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Pollo Doble",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Pollo Sencilla",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Res Barbacoa Doble",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Res Barbacoa Sencilla",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Res Chipotle Doble",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Res Doble",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Res Hawaiana Doble",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa de Res Hawaiana Sencilla",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Panini Chicken Chipotle",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Pollo A la Plancha",i:"Lechuga",c:0.3,u:"UNIDAD"},{p:"Promo Hamburguesa de Res Sencilla + Papas $6",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Sandwich de Atún Doble",i:"Lechuga",c:0.2,u:"UNIDAD"},{p:"Sandwich de Atún Sencillo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Sandwich de Jamón de Pavo Doble",i:"Lechuga",c:0.2,u:"UNIDAD"},{p:"Sandwich de Jamón de Pavo Sencillo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Sandwich de Pollo Doble",i:"Lechuga",c:0.2,u:"UNIDAD"},{p:"Sandwich de Pollo Sencillo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa Evento Infantil",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Hamburguesa Mini Evento",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Club Sandwich",i:"Aioli",c:1.0,u:"OZ"},{p:"Hamburguesa de Pollo Doble",i:"Aioli",c:1.0,u:"OZ"},{p:"Hamburguesa de Pollo Sencilla",i:"Aioli",c:1.0,u:"OZ"},{p:"Hamburguesa de Res Doble",i:"Aioli",c:1.0,u:"OZ"},{p:"Hamburguesa de Res Sencilla",i:"Aioli",c:1.0,u:"OZ"},{p:"Pollo A la Plancha",i:"Aioli",c:1.0,u:"OZ"},{p:"Promo Hamburguesa de Res Sencilla + Papas $6",i:"Aioli",c:1.0,u:"OZ"},{p:"Hamburguesa Evento Infantil",i:"Aioli",c:1.0,u:"OZ"},{p:"Hamburguesa Mini Evento",i:"Aioli",c:1.0,u:"OZ"},{p:"Ciabatta de Jamón de Pavo",i:"Arugula",c:20.0,u:"GR"},{p:"Ciabatta de Pollo",i:"Arugula",c:20.0,u:"GR"},{p:"Hamburguesa de Pollo Doble",i:"Arugula",c:20.0,u:"GR"},{p:"Hamburguesa de Pollo Sencilla",i:"Arugula",c:20.0,u:"GR"},{p:"Hamburguesa de Res Barbacoa Doble",i:"Arugula",c:20.0,u:"GR"},{p:"Hamburguesa de Res Barbacoa Sencilla",i:"Arugula",c:20.0,u:"GR"},{p:"Hamburguesa de Res Chipotle Doble",i:"Arugula",c:20.0,u:"GR"},{p:"Hamburguesa de Res Chipotle Sencilla",i:"Arugula",c:20.0,u:"GR"},{p:"Hamburguesa de Res Doble",i:"Arugula",c:20.0,u:"GR"},{p:"Hamburguesa de Res Hawaiana Doble",i:"Arugula",c:20.0,u:"UNIDAD"},{p:"Hamburguesa de Res Hawaiana Sencilla",i:"Arugula",c:20.0,u:"GR"},{p:"Hamburguesa de Res Sencilla",i:"Arugula",c:20.0,u:"GR"},{p:"Panini Chicken Chipotle",i:"Arugula",c:20.0,u:"GR"},{p:"Sandwich Capresse",i:"Arugula",c:20.0,u:"GR"},{p:"Sandwich de Atún Doble",i:"Arugula",c:40.0,u:"GR"},{p:"Sandwich de Atún Sencillo",i:"Arugula",c:20.0,u:"GR"},{p:"Sandwich de Jamón de Pavo Doble",i:"Arugula",c:40.0,u:"GR"},{p:"Sandwich de Jamón de Pavo Sencillo",i:"Arugula",c:20.0,u:"GR"},{p:"Sandwich de Pollo Doble",i:"Arugula",c:40.0,u:"GR"},{p:"Sandwich de Pollo Sencillo",i:"Arugula",c:20.0,u:"GR"},{p:"Hamburguesa de Res Barbacoa Doble",i:"Salsa Barbacoa",c:1.0,u:"OZ"},{p:"Hamburguesa de Res Barbacoa Sencilla",i:"Salsa Barbacoa",c:1.0,u:"OZ"},{p:"Frozen Fruta y Agua 16 OZ",i:"Hielo",c:1.0,u:"UNIDAD"},{p:"Frozen Fruta y Agua 20 OZ",i:"Hielo",c:1.25,u:"UNIDAD"},{p:"Ice Latte 16 OZ",i:"Hielo",c:0.5,u:"UNIDAD"},{p:"Crepa de Nutella Banano",i:"Nutella",c:2.0,u:"OZ"},{p:"Promo 2x 1 Crepa de Nutella Banano",i:"Nutella",c:4.0,u:"OZ"},
   {p:"Afogato Baileys",i:"Bola de Sorbete",c:3.0,u:"OZ"},
   {p:"Afogato Baileys",i:"Café",c:10.0,u:"GR"},
   {p:"Afogato Menta",i:"Bola de Sorbete",c:3.0,u:"OZ"},
@@ -398,17 +405,17 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Americano 12 OZ",i:"Café",c:40.0,u:"GR"},
   {p:"Bola de Sorbete",i:"Bola de Sorbete",c:1.5,u:"OZ"},
   {p:"Borbon",i:"Café Especialidad",c:450.0,u:"GR"},
-  {p:"Brownie Con Helado",i:"Bola de Sorbete",c:1.5,u:"OZ"},
+  
   {p:"Brownie Con Helado",i:"Brownie",c:1.0,u:"UNIDAD"},
   {p:"Brownie Sin Sorbete",i:"Brownie",c:1.0,u:"UNIDAD"},
   {p:"Café de Evento 8 OZ",i:"Café",c:20.0,u:"GR"},
   {p:"Café Especialidad",i:"Café Especialidad",c:21.0,u:"GR"},
   {p:"Cheesecake de Blueberry",i:"Cheese Cake de Frambuesa",c:1.0,u:"UNIDAD"},
   {p:"Cheesecake de Fresa",i:"Cheese Cake de Fresa",c:1.0,u:"UNIDAD"},
-  {p:"Cheesecake de Nutella",i:"Cheese Cake de Chocolate",c:1.0,u:"UNIDAD"},
+  
   {p:"Ciabatta de Jamón de Pavo",i:"Cebolla Morada",c:0.2,u:"UNIDAD"},
   {p:"Ciabatta de Jamón de Pavo",i:"Dijon",c:1.0,u:"OZ"},
-  {p:"Ciabatta de Jamón de Pavo",i:"Jamón",c:4.0,u:"LASCA"},
+  
   
   {p:"Ciabatta de Jamón de Pavo",i:"Pan Ciabatta",c:1.0,u:"UNIDAD"},
   {p:"Ciabatta de Jamón de Pavo",i:"Queso Americano",c:1.0,u:"LASCA"},
@@ -418,13 +425,13 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Ciabatta de Pollo",i:"Dijon",c:1.0,u:"OZ"},
   
   {p:"Ciabatta de Pollo",i:"Pan Ciabatta",c:1.0,u:"UNIDAD"},
-  {p:"Ciabatta de Pollo",i:"Pasta de Pollo",c:3.0,u:"OZ"},
+  
   {p:"Ciabatta de Pollo",i:"Queso Mix Bolsa",c:30.0,u:"GR"},
   {p:"Ciabatta de Pollo",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
   {p:"Club Sandwich",i:"Aguacate",c:0.25,u:"UNIDAD"},
   {p:"Club Sandwich",i:"Cebolla",c:0.2,u:"UNIDAD"},
   {p:"Club Sandwich",i:"Espinaca",c:0.1,u:"UNIDAD"},
-  {p:"Club Sandwich",i:"Jamón",c:4.0,u:"LASCA"},
+  
   {p:"Club Sandwich",i:"Pan Integral",c:3.0,u:"LASCA"},
   {p:"Club Sandwich",i:"Pepino",c:0.2,u:"UNIDAD"},
   {p:"Club Sandwich",i:"Queso Americano",c:2.0,u:"LASCA"},
@@ -435,22 +442,22 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Copa de Vino",i:"Vino",c:5.0,u:"OZ"},
   {p:"Corona",i:"Corona",c:1.0,u:"UNIDAD"},
   {p:"Crepa de Nutella Banano",i:"Banano",c:0.5,u:"UNIDAD"},
-  {p:"Crepa de Nutella Banano",i:"Bola de Sorbete",c:1.5,u:"OZ"},
-  {p:"Crepa de Nutella Banano",i:"Harina de Trigo",c:1.0,u:"CREPAS"},
-  {p:"Crepa de Nutella Fresa",i:"Bola de Sorbete",c:1.5,u:"OZ"},
+  
+  
+  
   {p:"Crepa de Nutella Fresa",i:"Fresas",c:2.0,u:"OZ"},
-  {p:"Crepa de Nutella Fresa",i:"Harina de Trigo",c:1.0,u:"CREPAS"},
+  
   {p:"Crepa de Nutella Fresa y Banano",i:"Banano",c:0.25,u:"UNIDAD"},
-  {p:"Crepa de Nutella Fresa y Banano",i:"Bola de Sorbete",c:1.5,u:"OZ"},
+  
   {p:"Crepa de Nutella Fresa y Banano",i:"Fresas",c:1.0,u:"OZ"},
-  {p:"Crepa de Nutella Fresa y Banano",i:"Harina de Trigo",c:1.0,u:"CREPAS"},
+  
   {p:"Ensalada de Papa",i:"Ensalada de Papa",c:3.0,u:"OZ"},
   {p:"Espresso",i:"Café",c:20.0,u:"GR"},
   {p:"Espresso Doble",i:"Café",c:40.0,u:"GR"},
   {p:"Espresso Lungo",i:"Café",c:10.0,u:"GR"},
   {p:"Espresso Macchiato",i:"Café",c:10.0,u:"GR"},
-  {p:"Flan de Queso Con Helado",i:"Bola de Sorbete",c:1.5,u:"OZ"},
-  {p:"Flan de Queso Con Helado",i:"Flan de Queso",c:1.0,u:"UNIDAD"},
+  
+  
   {p:"Frappe Con Licor (baileys) 16 OZ",i:"Café",c:40.0,u:"GR"},
   {p:"Frappe Con Licor (baileys) 16 OZ",i:"Leche",c:6.0,u:"OZ"},
   {p:"Frappe Con Licor (baileys) 20 OZ",i:"Café",c:50.0,u:"GR"},
@@ -514,29 +521,29 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Geisha Natural",i:"Café Especialidad",c:450.0,u:"GR"},
   {p:"Hamburguesa de Pollo Doble",i:"Cebolla Morada",c:0.2,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Pollo Doble",i:"Pan de Hamburguesa",c:1.0,u:"UNIDAD"},
-  {p:"Hamburguesa de Pollo Doble",i:"Pechuga Deshuesada Sello de Oro",c:2,u:"UNIDAD"},
+  
+  
   {p:"Hamburguesa de Pollo Doble",i:"Pepino",c:0.2,u:"UNIDAD"},
   {p:"Hamburguesa de Pollo Doble",i:"Queso Americano",c:2.0,u:"LASCA"},
   {p:"Hamburguesa de Pollo Doble",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
   {p:"Hamburguesa de Pollo Sencilla",i:"Cebolla Morada",c:0.2,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Pollo Sencilla",i:"Pan de Hamburguesa",c:1.0,u:"UNIDAD"},
-  {p:"Hamburguesa de Pollo Sencilla",i:"Pechuga Deshuesada Sello de Oro",c:1,u:"UNIDAD"},
+  
+  
   {p:"Hamburguesa de Pollo Sencilla",i:"Pepino",c:0.2,u:"UNIDAD"},
   {p:"Hamburguesa de Pollo Sencilla",i:"Queso Americano",c:1.0,u:"LASCA"},
   {p:"Hamburguesa de Pollo Sencilla",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
   {p:"Hamburguesa de Res Barbacoa Doble",i:"Carne",c:2,u:"UNIDAD"},
   {p:"Hamburguesa de Res Barbacoa Doble",i:"Cebolla",c:0.2,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Res Barbacoa Doble",i:"Pan de Hamburguesa",c:1.0,u:"UNIDAD"},
+  
   {p:"Hamburguesa de Res Barbacoa Doble",i:"Pepino",c:0.2,u:"UNIDAD"},
   {p:"Hamburguesa de Res Barbacoa Doble",i:"Queso Americano",c:2.0,u:"LASCA"},
   {p:"Hamburguesa de Res Barbacoa Doble",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
   {p:"Hamburguesa de Res Barbacoa Sencilla",i:"Carne",c:1,u:"UNIDAD"},
   {p:"Hamburguesa de Res Barbacoa Sencilla",i:"Cebolla",c:0.2,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Res Barbacoa Sencilla",i:"Pan de Hamburguesa",c:1.0,u:"UNIDAD"},
+  
   {p:"Hamburguesa de Res Barbacoa Sencilla",i:"Pepino",c:0.2,u:"UNIDAD"},
   {p:"Hamburguesa de Res Barbacoa Sencilla",i:"Queso Americano",c:1.0,u:"LASCA"},
   {p:"Hamburguesa de Res Barbacoa Sencilla",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
@@ -545,7 +552,7 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Hamburguesa de Res Chipotle Doble",i:"Cebolla Morada",c:0.2,u:"UNIDAD"},
   {p:"Hamburguesa de Res Chipotle Doble",i:"Chipotle",c:1.0,u:"OZ"},
   
-  {p:"Hamburguesa de Res Chipotle Doble",i:"Pan de Hamburguesa",c:1.0,u:"UNIDAD"},
+  
   {p:"Hamburguesa de Res Chipotle Doble",i:"Pepino",c:0.2,u:"UNIDAD"},
   {p:"Hamburguesa de Res Chipotle Doble",i:"Queso Americano",c:2.0,u:"LASCA"},
   {p:"Hamburguesa de Res Chipotle Doble",i:"Tocino",c:4.0,u:"LASCA"},
@@ -557,26 +564,26 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Hamburguesa de Res Doble",i:"Carne",c:2,u:"UNIDAD"},
   {p:"Hamburguesa de Res Doble",i:"Cebolla Morada",c:0.2,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Res Doble",i:"Pan de Hamburguesa",c:1.0,u:"UNIDAD"},
+  
   {p:"Hamburguesa de Res Doble",i:"Pepino",c:0.2,u:"UNIDAD"},
   {p:"Hamburguesa de Res Doble",i:"Queso Americano",c:2.0,u:"LASCA"},
   {p:"Hamburguesa de Res Doble",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
   {p:"Hamburguesa de Res Hawaiana Doble",i:"Carne",c:2,u:"UNIDAD"},
   {p:"Hamburguesa de Res Hawaiana Doble",i:"Cebolla Morada",c:0.2,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Res Hawaiana Doble",i:"Pan de Hamburguesa",c:1.0,u:"UNIDAD"},
+  
   {p:"Hamburguesa de Res Hawaiana Doble",i:"Piña Lascas",c:1.0,u:"LASCA"},
   {p:"Hamburguesa de Res Hawaiana Doble",i:"Queso Mozzarella",c:2.0,u:"LASCA"},
   {p:"Hamburguesa de Res Hawaiana Sencilla",i:"Carne",c:1,u:"UNIDAD"},
   {p:"Hamburguesa de Res Hawaiana Sencilla",i:"Cebolla Morada",c:0.2,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Res Hawaiana Sencilla",i:"Pan de Hamburguesa",c:1.0,u:"UNIDAD"},
+  
   {p:"Hamburguesa de Res Hawaiana Sencilla",i:"Piña Lascas",c:1.0,u:"LASCA"},
   {p:"Hamburguesa de Res Hawaiana Sencilla",i:"Queso Mozzarella",c:1.0,u:"LASCA"},
   {p:"Hamburguesa de Res Sencilla",i:"Carne",c:1,u:"UNIDAD"},
   {p:"Hamburguesa de Res Sencilla",i:"Cebolla Morada",c:0.2,u:"UNIDAD"},
   {p:"Hamburguesa la Golosa del Rincón",i:"Carne",c:2,u:"UNIDAD"},
-  {p:"Hamburguesa la Golosa del Rincón",i:"Pan de Hamburguesa",c:1.0,u:"UNIDAD"},
+  
   {p:"Hamburguesa la Golosa del Rincón",i:"Queso Americano",c:4.0,u:"LASCA"},
   {p:"Hamburguesa la Golosa del Rincón",i:"Tocino",c:4.0,u:"LASCA"},
   {p:"Heineken",i:"Heineken",c:1.0,u:"UNIDAD"},
@@ -611,7 +618,7 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Ice Moca Menta 20 OZ",i:"Leche",c:12.5,u:"OZ"},
   {p:"Ice Moca Menta 20 OZ",i:"Sirope",c:1.25,u:"OZ"},
   {p:"Kinley",i:"Kinley",c:1.0,u:"UNIDAD"},
-  {p:"Latte Chai",i:"Café",c:20.0,u:"GR"},
+  
   {p:"Latte Chai",i:"Cup Chai",c:30.0,u:"GR"},
   {p:"Latte Chai",i:"Leche",c:10.0,u:"OZ"},
   {p:"Leche",i:"Café",c:40.0,u:"GR"},
@@ -643,9 +650,9 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Milk Shake de Vainilla 20 OZ",i:"Bola de Sorbete",c:9.375,u:"OZ"},
   {p:"Milk Shake de Vainilla 20 OZ",i:"Fresas",c:3.75,u:"OZ"},
   {p:"Milk Shake de Vainilla 20 OZ",i:"Leche",c:2.5,u:"OZ"},
-  {p:"Mini Sandwichitos",i:"Jamón",c:2.0,u:"LASCA"},
+  
   {p:"Mini Sandwichitos",i:"Pan Integral",c:6.0,u:"LASCA"},
-  {p:"Mini Sandwichitos",i:"Pasta de Pollo",c:3.0,u:"OZ"},
+  
   {p:"Mini Sandwichitos",i:"Queso Americano",c:4.0,u:"LASCA"},
   {p:"Mini Sandwichitos",i:"Queso Mozzarella",c:2.0,u:"LASCA"},
   {p:"Modelo",i:"Modelo",c:1.0,u:"UNIDAD"},
@@ -655,12 +662,12 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Panini Chicken Chipotle",i:"Chipotle",c:1.0,u:"OZ"},
   
   {p:"Panini Chicken Chipotle",i:"Pan Ciabatta",c:1.0,u:"UNIDAD"},
-  {p:"Panini Chicken Chipotle",i:"Pechuga Deshuesada Sello de Oro",c:1,u:"UNIDAD"},
+  
   {p:"Panini Chicken Chipotle",i:"Queso Mozzarella",c:1.0,u:"LASCA"},
   {p:"Panini Chicken Chipotle",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
-  {p:"Pie de Higo",i:"Pie de Higo",c:1.0,u:"UNIDAD"},
-  {p:"Pie de Limón",i:"Pie de Limon",c:1.0,u:"UNIDAD"},
-  {p:"Pie de Manzana",i:"Pie de Manzana",c:1.0,u:"UNIDAD"},
+  
+  
+  
   {p:"Pilsener",i:"Pilsener",c:1.0,u:"UNIDAD"},
   {p:"Pollo A la Plancha",i:"Aguacate",c:0.5,u:"UNIDAD"},
   {p:"Pollo A la Plancha",i:"Cebolla Morada",c:0.2,u:"UNIDAD"},
@@ -677,10 +684,10 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Promo Hamburguesa de Res Sencilla + Papas $6",i:"Pepino",c:0.2,u:"UNIDAD"},
   {p:"Promo Hamburguesa de Res Sencilla + Papas $6",i:"Queso Americano",c:1.0,u:"LASCA"},
   {p:"Promo Hamburguesa de Res Sencilla + Papas $6",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
-  {p:"Quesadilla de Jamón de Pavo",i:"Jamón",c:4.0,u:"LASCA"},
+  
   {p:"Quesadilla de Jamón de Pavo",i:"Queso Mix Bolsa",c:30.0,u:"GR"},
   {p:"Quesadilla de Jamón de Pavo",i:"Tortilla Rapidita",c:2.0,u:"UNIDAD"},
-  {p:"Quesadilla de Pollo",i:"Pasta de Pollo",c:3.0,u:"OZ"},
+  
   {p:"Quesadilla de Pollo",i:"Queso Mix Bolsa",c:30.0,u:"GR"},
   {p:"Quesadilla de Pollo",i:"Tortilla Rapidita",c:2.0,u:"UNIDAD"},
   {p:"Quesadilla de Pollo Chipotle",i:"Aguacate",c:0.25,u:"UNIDAD"},
@@ -694,18 +701,18 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Sandwich Capresse",i:"Cebolla Morada",c:0.2,u:"UNIDAD"},
   {p:"Sandwich Capresse",i:"Espinaca",c:0.04,u:"UNIDAD"},
   {p:"Sandwich Capresse",i:"Pan Integral",c:2.0,u:"LASCA"},
-  {p:"Sandwich Capresse",i:"Pechuga Deshuesada Sello de Oro",c:1,u:"UNIDAD"},
-  {p:"Sandwich Capresse",i:"Pesto de Albahaca",c:1.0,u:"OZ"},
+  
+  
   {p:"Sandwich Capresse",i:"Queso Mozzarella",c:4.0,u:"LASCA"},
   {p:"Sandwich Capresse",i:"Tomate Manzano",c:0.5,u:"UNIDAD"},
-  {p:"Sandwich de Atún Doble",i:"Atún",c:0.4,u:"LATA"},
+  
   {p:"Sandwich de Atún Doble",i:"Cebolla Morada",c:0.4,u:"UNIDAD"},
   {p:"Sandwich de Atún Doble",i:"Dijon",c:2.0,u:"OZ"},
   
   {p:"Sandwich de Atún Doble",i:"Pan Integral",c:6.0,u:"LASCA"},
   {p:"Sandwich de Atún Doble",i:"Queso Mozzarella",c:4.0,u:"LASCA"},
   {p:"Sandwich de Atún Doble",i:"Tomate Manzano",c:0.5,u:"UNIDAD"},
-  {p:"Sandwich de Atún Sencillo",i:"Atún",c:0.2,u:"LATA"},
+  
   {p:"Sandwich de Atún Sencillo",i:"Cebolla Morada",c:0.2,u:"UNIDAD"},
   {p:"Sandwich de Atún Sencillo",i:"Dijon",c:1.0,u:"OZ"},
   
@@ -713,12 +720,12 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Sandwich de Atún Sencillo",i:"Queso Mozzarella",c:2.0,u:"LASCA"},
   {p:"Sandwich de Atún Sencillo",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
   {p:"Sandwich de Jamón de Pavo Doble",i:"Dijon",c:2.0,u:"OZ"},
-  {p:"Sandwich de Jamón de Pavo Doble",i:"Jamón",c:8.0,u:"LASCA"},
+  
   
   {p:"Sandwich de Jamón de Pavo Doble",i:"Pan Integral",c:6.0,u:"LASCA"},
   {p:"Sandwich de Jamón de Pavo Doble",i:"Tomate Manzano",c:0.5,u:"UNIDAD"},
   {p:"Sandwich de Jamón de Pavo Sencillo",i:"Dijon",c:1.0,u:"OZ"},
-  {p:"Sandwich de Jamón de Pavo Sencillo",i:"Jamón",c:4.0,u:"LASCA"},
+  
   
   {p:"Sandwich de Jamón de Pavo Sencillo",i:"Pan Integral",c:3.0,u:"LASCA"},
   {p:"Sandwich de Jamón de Pavo Sencillo",i:"Queso Americano",c:2.0,u:"LASCA"},
@@ -727,14 +734,14 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Sandwich de Pollo Doble",i:"Dijon",c:2.0,u:"OZ"},
   
   {p:"Sandwich de Pollo Doble",i:"Pan Integral",c:6.0,u:"LASCA"},
-  {p:"Sandwich de Pollo Doble",i:"Pasta de Pollo",c:6.0,u:"OZ"},
+  
   {p:"Sandwich de Pollo Doble",i:"Pepino",c:0.4,u:"UNIDAD"},
   {p:"Sandwich de Pollo Doble",i:"Queso Americano",c:4.0,u:"LASCA"},
   {p:"Sandwich de Pollo Doble",i:"Tomate Manzano",c:0.5,u:"UNIDAD"},
   {p:"Sandwich de Pollo Sencillo",i:"Dijon",c:1.0,u:"OZ"},
   
   {p:"Sandwich de Pollo Sencillo",i:"Pan Integral",c:3.0,u:"LASCA"},
-  {p:"Sandwich de Pollo Sencillo",i:"Pasta de Pollo",c:3.0,u:"OZ"},
+  
   {p:"Sandwich de Pollo Sencillo",i:"Pepino",c:0.2,u:"UNIDAD"},
   {p:"Sandwich de Pollo Sencillo",i:"Queso Americano",c:2.0,u:"LASCA"},
   {p:"Sandwich de Pollo Sencillo",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
@@ -769,11 +776,11 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Té Chai 12 OZ",i:"Leche",c:10.0,u:"OZ"},
   {p:"Té de Taro",i:"Cup Taro",c:30.0,u:"GR"},
   {p:"Té de Taro",i:"Leche",c:10.0,u:"OZ"},
-  {p:"Té Infusiones",i:"Té Infusiones",c:3.0,u:"GR"},
-  {p:"Té Matcha",i:"Cup de Matcha",c:30.0,u:"GR"},
+  
+  
   {p:"Té Matcha",i:"Leche",c:10.0,u:"OZ"},
   {p:"Tocino",i:"Tocino",c:2.0,u:"LASCA"},
-  {p:"Tostadas de Plátano",i:"Tostadas de Platano",c:0.5,u:"UNIDAD"},
+  
   {p:"Ultra",i:"Ultra",c:1.0,u:"UNIDAD"},
   {p:"Promo 2x1 Pilsener",i:"Pilsener",c:2.0,u:"UNIDAD"},
   {p:"Promo 2x1 Gallo",i:"Gallo",c:2.0,u:"UNIDAD"},
@@ -802,14 +809,14 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Hamburguesa Mini Evento",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
   {p:"Panini Pesto Evento Infantil",i:"Cebolla Morada",c:0.2,u:"UNIDAD"},
   {p:"Panini Pesto Evento Infantil",i:"Pan Ciabatta",c:1.0,u:"UNIDAD"},
-  {p:"Panini Pesto Evento Infantil",i:"Pechuga Deshuesada Sello de Oro",c:1,u:"UNIDAD"},
-  {p:"Panini Pesto Evento Infantil",i:"Pesto de Albahaca",c:1.0,u:"OZ"},
+  
+  
   {p:"Panini Pesto Evento Infantil",i:"Queso Mozzarella",c:1.0,u:"LASCA"},
   {p:"Panini Pesto Evento Infantil",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
   {p:"Panini Pesto Mini Evento",i:"Cebolla Morada",c:0.2,u:"UNIDAD"},
   {p:"Panini Pesto Mini Evento",i:"Pan Ciabatta",c:1.0,u:"UNIDAD"},
-  {p:"Panini Pesto Mini Evento",i:"Pechuga Deshuesada Sello de Oro",c:1,u:"UNIDAD"},
-  {p:"Panini Pesto Mini Evento",i:"Pesto de Albahaca",c:1.0,u:"OZ"},
+  
+  
   {p:"Panini Pesto Mini Evento",i:"Queso Mozzarella",c:1.0,u:"LASCA"},
   {p:"Panini Pesto Mini Evento",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
   {p:"Promo 2x1 Crepa de Nutella Banano",i:"Americano 8 OZ",c:2.0,u:"UNIDAD"},
@@ -834,14 +841,14 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Botella de Vino",i:"Vino",c:26.0,u:"OZ"},
   {p:"Brownie Unidad",i:"Brownie",c:2.0,u:"UNIDAD"},
   {p:"soda fanta",i:"Fanta",c:1.0,u:"UNIDAD"},
-  {p:"Brownie Con Helado",i:"Bola De Sorbete",c:1.5,u:"oz"},
-  {p:"Bruchetta",i:"Pan Integral",c:4.0,u:"lascas"},
-  {p:"Bruchetta",i:"Queso Mozzarella",c:4.0,u:"lascas"},
-  {p:"Bruchetta",i:"Pesto De Albahaca",c:2.0,u:"oz"},
-  {p:"Bruchetta",i:"Tomate Manzano",c:1.0,u:"unidades"},
-  {p:"Café de Evento 8 OZ",i:"café uso",c:20.0,u:"gramos"},
-  {p:"Café",i:"Café uso",c:40.0,u:"gramos"},
-  {p:"Café Especialidad",i:"Café especialidad",c:21.0,u:"gramos"},
+  {p:"Brownie Con Helado",i:"Bola De Sorbete",c:1.5,u:"OZ"},
+  {p:"Bruchetta",i:"Pan Integral",c:4.0,u:"LASCA"},
+  {p:"Bruchetta",i:"Queso Mozzarella",c:4.0,u:"LASCA"},
+  {p:"Bruchetta",i:"Pesto De Albahaca",c:2.0,u:"OZ"},
+  {p:"Bruchetta",i:"Tomate Manzano",c:1.0,u:"UNIDAD"},
+  {p:"Café de Evento 8 OZ",i:"café uso",c:20.0,u:"GR"},
+  {p:"Café",i:"Café uso",c:40.0,u:"GR"},
+  
   {p:"Cappuccino Saborizado 8 OZ",i:"Café",c:10.0,u:"GR"},
   {p:"Cappuccino Saborizado 8 OZ",i:"Leche",c:6.0,u:"OZ"},
   {p:"Cappuccino Saborizado 8 OZ",i:"Sirope",c:1.0,u:"OZ"},
@@ -852,31 +859,29 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Cappuccino Tradicional 8 OZ",i:"Leche",c:6.0,u:"OZ"},
   {p:"Cappuccino Tradicional 12 OZ",i:"Café",c:20.0,u:"GR"},
   {p:"Cappuccino Tradicional 12 OZ",i:"Leche",c:10.0,u:"OZ"},
-  {p:"Cheesecake de Fresa",i:"Chess Cake De Fresa",c:1.0,u:"unidades"},
-  {p:"Cheesecake de Maracuyá",i:"Cheese Cake De Maracuya",c:1.0,u:"unidades"},
-  {p:"Cheesecake de Nutella",i:"Cheese Cake De Chocolate",c:1.0,u:"unidades"},
-  {p:"Ciabatta de Jamón de Pavo",i:"Pan Ciabbatta",c:1.0,u:"unidades"},
-  {p:"Ciabatta de Jamón de Pavo",i:"Jamon",c:4.0,u:"lascas"},
+  {p:"Cheesecake de Fresa",i:"Chess Cake De Fresa",c:1.0,u:"UNIDAD"},
+  {p:"Cheesecake de Maracuyá",i:"Cheese Cake De Maracuya",c:1.0,u:"UNIDAD"},
+  {p:"Cheesecake de Nutella",i:"Cheese Cake De Chocolate",c:1.0,u:"UNIDAD"},
+  {p:"Ciabatta de Jamón de Pavo",i:"Jamon",c:4.0,u:"LASCA"},
   
-  {p:"Ciabatta de Pollo",i:"Pan Ciabbatta",c:1.0,u:"unidades"},
   {p:"Ciabatta de Pollo",i:"Pasta De Pollo",c:3.0,u:"OZ"},
   
-  {p:"Club Sandwich",i:"Pan Masa Madre",c:3.0,u:"lascas"},
-  {p:"Club Sandwich",i:"Jamon",c:4.0,u:"lascas"},
+  {p:"Club Sandwich",i:"Pan Masa Madre",c:3.0,u:"LASCA"},
+  {p:"Club Sandwich",i:"Jamon",c:4.0,u:"LASCA"},
   {p:"Coca Cola",i:"Coca Cola",c:1.0,u:"UNIDAD"},
-  {p:"Crepa de Nutella Banano",i:"Harina De Trigo",c:1.0,u:"crepas"},
-  {p:"Crepa de Nutella Banano",i:"Bola De Sorbete",c:1.5,u:"oz"},
-  {p:"Crepa de Nutella Banano",i:"Hershy Chocolate",c:1.0,u:"oz"},
-  {p:"Crepa de Nutella Fresa",i:"Harina De Trigo",c:1.0,u:"crepas"},
-  {p:"Crepa de Nutella Fresa",i:"Bola De Sorbete",c:1.5,u:"oz"},
-  {p:"Crepa de Nutella Fresa",i:"Hershy Chocolate",c:1.0,u:"oz"},
-  {p:"Crepa de Nutella Fresa y Banano",i:"Harina De Trigo",c:1.0,u:"crepas"},
-  {p:"Crepa de Nutella Fresa y Banano",i:"Bola De Sorbete",c:1.5,u:"oz"},
-  {p:"Crepa de Nutella Fresa y Banano",i:"Hershy Chocolate",c:1.0,u:"oz"},
-  {p:"Ensalada de Papa",i:"Ensalada de papa",c:3.0,u:"oz"},
+  {p:"Crepa de Nutella Banano",i:"Harina De Trigo",c:1.0,u:"CREPAS"},
+  {p:"Crepa de Nutella Banano",i:"Bola De Sorbete",c:1.5,u:"OZ"},
+  {p:"Crepa de Nutella Banano",i:"Hershy Chocolate",c:1.0,u:"OZ"},
+  {p:"Crepa de Nutella Fresa",i:"Harina De Trigo",c:1.0,u:"CREPAS"},
+  {p:"Crepa de Nutella Fresa",i:"Bola De Sorbete",c:1.5,u:"OZ"},
+  {p:"Crepa de Nutella Fresa",i:"Hershy Chocolate",c:1.0,u:"OZ"},
+  {p:"Crepa de Nutella Fresa y Banano",i:"Harina De Trigo",c:1.0,u:"CREPAS"},
+  {p:"Crepa de Nutella Fresa y Banano",i:"Bola De Sorbete",c:1.5,u:"OZ"},
+  {p:"Crepa de Nutella Fresa y Banano",i:"Hershy Chocolate",c:1.0,u:"OZ"},
+  
   {p:"Espresso Ristreto",i:"Café",c:10.0,u:"GR"},
-  {p:"Flan de Queso Con Helado",i:"Bola De Sorbete",c:1.5,u:"oz"},
-  {p:"Flan de Queso Con Helado",i:"Flan De Queso",c:1.0,u:"unidades"},
+  {p:"Flan de Queso Con Helado",i:"Bola De Sorbete",c:1.5,u:"OZ"},
+  {p:"Flan de Queso Con Helado",i:"Flan De Queso",c:1.0,u:"UNIDAD"},
   {p:"Flan sin Sorbete",i:"Flan de Queso",c:1.0,u:"UNIDAD"},
   {p:"Frappe Con Licor (Baileys) 16 OZ",i:"Café",c:40.0,u:"GR"},
   {p:"Frappe Con Licor (Baileys) 16 OZ",i:"Leche",c:6.0,u:"OZ"},
@@ -886,81 +891,80 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Frozen Fruta y Agua 16 OZ",i:"Jarabe",c:3.0,u:"OZ"},
   {p:"Frozen Fruta y Agua 20 OZ",i:"Fruta Elección",c:1.0,u:"OPCIÓN"},
   {p:"Frozen Fruta y Agua 20 OZ",i:"Jarabe",c:3.75,u:"OZ"},
-  {p:"Hamburguesa de Pollo Doble",i:"Pan De Hamburguesa",c:1.0,u:"unidades"},
+  {p:"Hamburguesa de Pollo Doble",i:"Pan De Hamburguesa",c:1.0,u:"UNIDAD"},
   {p:"Hamburguesa de Pollo Doble",i:"Pechuga Deshuesada Sello De Oro",c:2,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Pollo Sencilla",i:"Pan De Hamburguesa",c:1.0,u:"unidades"},
+  {p:"Hamburguesa de Pollo Sencilla",i:"Pan De Hamburguesa",c:1.0,u:"UNIDAD"},
   {p:"Hamburguesa de Pollo Sencilla",i:"Pechuga Deshuesada Sello De Oro",c:1,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Res Barbacoa Doble",i:"Pan De Hamburguesa",c:1.0,u:"unidades"},
+  {p:"Hamburguesa de Res Barbacoa Doble",i:"Pan De Hamburguesa",c:1.0,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Res Barbacoa Sencilla",i:"Pan De Hamburguesa",c:1.0,u:"unidades"},
+  {p:"Hamburguesa de Res Barbacoa Sencilla",i:"Pan De Hamburguesa",c:1.0,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Res Chipotle Doble",i:"Pan De Hamburguesa",c:1.0,u:"unidades"},
+  {p:"Hamburguesa de Res Chipotle Doble",i:"Pan De Hamburguesa",c:1.0,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Res Chipotle Sencilla",i:"Pan De Hamburguesa",c:1.0,u:"unidades"},
+  {p:"Hamburguesa de Res Chipotle Sencilla",i:"Pan De Hamburguesa",c:1.0,u:"UNIDAD"},
   {p:"Hamburguesa de Res Chipotle Sencilla",i:"Carne",c:1,u:"UNIDAD"},
-  {p:"Hamburguesa de Res Chipotle Sencilla",i:"Chipotle",c:1.0,u:"oz"},
-  {p:"Hamburguesa de Res Chipotle Sencilla",i:"Cebolla Morada",c:0.2,u:"unidades"},
-  {p:"Hamburguesa de Res Chipotle Sencilla",i:"Pepino",c:0.2,u:"unidades"},
+  {p:"Hamburguesa de Res Chipotle Sencilla",i:"Chipotle",c:1.0,u:"OZ"},
+  {p:"Hamburguesa de Res Chipotle Sencilla",i:"Cebolla Morada",c:0.2,u:"UNIDAD"},
+  {p:"Hamburguesa de Res Chipotle Sencilla",i:"Pepino",c:0.2,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Res Doble",i:"Pan De Hamburguesa",c:1.0,u:"unidades"},
+  {p:"Hamburguesa de Res Doble",i:"Pan De Hamburguesa",c:1.0,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Res Hawaiana Doble",i:"Pan De Hamburguesa",c:1.0,u:"unidades"},
-  {p:"Hamburguesa de Res Hawaiana Doble",i:"Tomate Manzano",c:0.25,u:"unidades"},
-  {p:"Hamburguesa de Res Hawaiana Doble",i:"Pepino",c:0.075,u:"unidades"},
+  {p:"Hamburguesa de Res Hawaiana Doble",i:"Pan De Hamburguesa",c:1.0,u:"UNIDAD"},
+  {p:"Hamburguesa de Res Hawaiana Doble",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
+  {p:"Hamburguesa de Res Hawaiana Doble",i:"Pepino",c:0.075,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Res Hawaiana Sencilla",i:"Pan De Hamburguesa",c:1.0,u:"unidades"},
+  {p:"Hamburguesa de Res Hawaiana Sencilla",i:"Pan De Hamburguesa",c:1.0,u:"UNIDAD"},
   
-  {p:"Hamburguesa de Res Sencilla",i:"Pan De Hamburguesa",c:1.0,u:"unidades"},
-  {p:"Hamburguesa de Res Sencilla",i:"Queso Americano",c:1.0,u:"lascas"},
-  {p:"Hamburguesa de Res Sencilla",i:"Tomate Manzano",c:0.25,u:"unidades"},
-  {p:"Hamburguesa de Res Sencilla",i:"Pepino",c:0.2,u:"unidades"},
+  {p:"Hamburguesa de Res Sencilla",i:"Pan De Hamburguesa",c:1.0,u:"UNIDAD"},
+  {p:"Hamburguesa de Res Sencilla",i:"Queso Americano",c:1.0,u:"LASCA"},
+  {p:"Hamburguesa de Res Sencilla",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
+  {p:"Hamburguesa de Res Sencilla",i:"Pepino",c:0.2,u:"UNIDAD"},
   
-  {p:"Hamburguesa la Golosa del Rincón",i:"Pan De Hamburguesa",c:1.0,u:"unidades"},
+  {p:"Hamburguesa la Golosa del Rincón",i:"Pan De Hamburguesa",c:1.0,u:"UNIDAD"},
   {p:"Ice Baileys 16 OZ",i:"Hershy Chocolate",c:1.0,u:"OZ"},
   {p:"Ice Baileys 20 OZ",i:"Hershy Chocolate",c:1.25,u:"OZ"},
-  {p:"Ice Latte 16 OZ",i:"Cafe Preparacion",c:2.0,u:"oz"},
+  {p:"Ice Latte 16 OZ",i:"Cafe Preparacion",c:2.0,u:"OZ"},
   {p:"Ice Moca 16 OZ",i:"Hershy Chocolate",c:1.0,u:"OZ"},
   {p:"Ice Moca 20 OZ",i:"Hershy Chocolate",c:1.25,u:"OZ"},
   {p:"Ice Moca Menta 16 OZ",i:"Hershy Chocolate",c:1.0,u:"OZ"},
   {p:"Ice Moca Menta 20 OZ",i:"Hershy Chocolate",c:1.25,u:"OZ"},
-  {p:"Latte Chai",i:"Cafe",c:40.0,u:"gramos"},
-  {p:"Latte Chai",i:"Cafe Preparacion",c:1.0,u:"oz"},
+  
+  {p:"Latte Chai",i:"Cafe Preparacion",c:1.0,u:"OZ"},
   {p:"Latte Saborizado 12 OZ",i:"Café",c:20.0,u:"GR"},
   {p:"Latte Saborizado 12 OZ",i:"Leche",c:10.0,u:"OZ"},
   {p:"Latte Saborizado 12 OZ",i:"Sirope",c:1.0,u:"OZ"},
   {p:"Latte Tradicional 12 OZ",i:"Café",c:20.0,u:"GR"},
   {p:"Latte Tradicional 12 OZ",i:"Leche",c:10.0,u:"OZ"},
   {p:"Limonada Azul",i:"Jarabe",c:3.0,u:"FL/OZ"},
-  {p:"Limonada Azul",i:"bobas",c:3.0,u:"oz"},
-  {p:"Limonada Azul",i:"Jugo de limon",c:2.0,u:"oz"},
+  {p:"Limonada Azul",i:"bobas",c:3.0,u:"OZ"},
+  {p:"Limonada Azul",i:"Jugo de limon",c:2.0,u:"OZ"},
   {p:"Limonada Chia",i:"Jarabe",c:3.0,u:"FL/OZ"},
-  {p:"Limonada Chia",i:"Semilla de Chia",c:1.5,u:"gramos"},
-  {p:"Limonada Chia",i:"Jugo de limon",c:2.0,u:"oz"},
-  {p:"Limonada Fresa",i:"Fresas",c:1.0,u:"oz"},
-  {p:"Limonada Fresa",i:"Jugo de limon",c:2.0,u:"oz"},
-  {p:"Limonada Fresa",i:"Jarabe",c:3.0,u:"oz"},
+  {p:"Limonada Chia",i:"Semilla de Chia",c:1.5,u:"GR"},
+  {p:"Limonada Chia",i:"Jugo de limon",c:2.0,u:"OZ"},
+  {p:"Limonada Fresa",i:"Fresas",c:1.0,u:"OZ"},
+  {p:"Limonada Fresa",i:"Jugo de limon",c:2.0,u:"OZ"},
+  {p:"Limonada Fresa",i:"Jarabe",c:3.0,u:"OZ"},
   {p:"Limonada Natural",i:"Jarabe",c:3.0,u:"FL/OZ"},
-  {p:"Limonada Natural",i:"Jugo de limon",c:2.0,u:"oz"},
-  {p:"Limonada Pepino",i:"Pepino",c:0.075,u:"unidades"},
-  {p:"Limonada Pepino",i:"Jugo de limon",c:2.0,u:"oz"},
-  {p:"Limonada Pepino",i:"Jarabe",c:3.0,u:"oz"},
-  {p:"Mini Sandwichitos",i:"Jamon",c:4.0,u:"lascas"},
-  {p:"Mini Sandwichitos",i:"Pasta De Pollo",c:3.0,u:"oz"},
-  {p:"Panini Chicken Al Pesto",i:"Pan Ciabbatta",c:1.0,u:"unidades"},
+  {p:"Limonada Natural",i:"Jugo de limon",c:2.0,u:"OZ"},
+  {p:"Limonada Pepino",i:"Pepino",c:0.075,u:"UNIDAD"},
+  {p:"Limonada Pepino",i:"Jugo de limon",c:2.0,u:"OZ"},
+  {p:"Limonada Pepino",i:"Jarabe",c:3.0,u:"OZ"},
+  
+  {p:"Mini Sandwichitos",i:"Pasta De Pollo",c:3.0,u:"OZ"},
+  {p:"Panini Chicken Al Pesto",i:"Pan Ciabbatta",c:1.0,u:"UNIDAD"},
   {p:"Panini Chicken Al Pesto",i:"Pechuga Deshuesada Sello De Oro",c:1,u:"UNIDAD"},
-  {p:"Panini Chicken Al Pesto",i:"Tomate Manzano",c:0.25,u:"unidades"},
-  {p:"Panini Chicken Al Pesto",i:"Cebolla Morada",c:0.2,u:"unidades"},
-  {p:"Panini Chicken Al Pesto",i:"Pesto De Albahaca",c:1.0,u:"oz"},
-  {p:"Panini Chicken Al Pesto",i:"Queso Mozzarella",c:1.0,u:"lascas"},
-  {p:"Panini Chicken Chipotle",i:"Pan Ciabbatta",c:1.0,u:"unidades"},
+  {p:"Panini Chicken Al Pesto",i:"Tomate Manzano",c:0.25,u:"UNIDAD"},
+  {p:"Panini Chicken Al Pesto",i:"Cebolla Morada",c:0.2,u:"UNIDAD"},
+  {p:"Panini Chicken Al Pesto",i:"Pesto De Albahaca",c:1.0,u:"OZ"},
+  {p:"Panini Chicken Al Pesto",i:"Queso Mozzarella",c:1.0,u:"LASCA"},
   {p:"Panini Chicken Chipotle",i:"Pechuga Deshuesada Sello De Oro",c:1,u:"UNIDAD"},
   
-  {p:"Papas Fritas",i:"Papa",c:1.5,u:"unidades"},
-  {p:"Pie de Higo",i:"Pie De Higo",c:1.0,u:"unidades"},
-  {p:"Pie de Limón",i:"Pie De Limon",c:1.0,u:"unidades"},
-  {p:"Pie de Manzana",i:"Pie De Manzana",c:1.0,u:"unidades"},
+  {p:"Papas Fritas",i:"Papa",c:1.5,u:"UNIDAD"},
+  {p:"Pie de Higo",i:"Pie De Higo",c:1.0,u:"UNIDAD"},
+  {p:"Pie de Limón",i:"Pie De Limon",c:1.0,u:"UNIDAD"},
+  {p:"Pie de Manzana",i:"Pie De Manzana",c:1.0,u:"UNIDAD"},
   {p:"Promo 2x 1 Crepa de Nutella Banano",i:"Banano",c:1.0,u:"UNIDAD"},
   {p:"Promo 2x 1 Crepa de Nutella Banano",i:"Bola de Sorbete",c:3.0,u:"OZ"},
   {p:"Promo 2x 1 Crepa de Nutella Banano",i:"Harina de Trigo",c:2.0,u:"CREPAS"},
@@ -973,35 +977,35 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Promo 2x 1 Crepa de Nutella Fresa y Banano",i:"Bola de Sorbete",c:3.0,u:"OZ"},
   {p:"Promo 2x 1 Crepa de Nutella Fresa y Banano",i:"Fresas",c:2.0,u:"OZ"},
   {p:"Promo 2x 1 Crepa de Nutella Fresa y Banano",i:"Hershy Chocolate",c:2.0,u:"OZ"},
-  {p:"Quesadilla de Jamón de Pavo",i:"Jamon",c:4.0,u:"lascas"},
-  {p:"Quesadilla de Pollo",i:"Pasta De Pollo",c:3.0,u:"oz"},
-  {p:"Quesadilla de Pollo Chipotle",i:"Pasta De Pollo",c:3.0,u:"oz"},
-  {p:"Sandwich Capresse",i:"Pan Masa Madre",c:2.0,u:"lascas"},
+  {p:"Quesadilla de Jamón de Pavo",i:"Jamon",c:4.0,u:"LASCA"},
+  {p:"Quesadilla de Pollo",i:"Pasta De Pollo",c:3.0,u:"OZ"},
+  {p:"Quesadilla de Pollo Chipotle",i:"Pasta De Pollo",c:3.0,u:"OZ"},
+  {p:"Sandwich Capresse",i:"Pan Masa Madre",c:2.0,u:"LASCA"},
   {p:"Sandwich Capresse",i:"Pechuga Deshuesada Sello De Oro",c:1,u:"UNIDAD"},
-  {p:"Sandwich Capresse",i:"Pesto De Albahaca",c:1.0,u:"oz"},
+  {p:"Sandwich Capresse",i:"Pesto De Albahaca",c:1.0,u:"OZ"},
   
   {p:"Sandwich de Atún Doble",i:"Atun",c:0.4,u:"latas"},
   
   {p:"Sandwich de Atún Sencillo",i:"Atun",c:0.2,u:"latas"},
   
-  {p:"Sandwich de Jamón de Pavo Doble",i:"Jamon",c:8.0,u:"lascas"},
-  {p:"Sandwich de Jamón de Pavo Doble",i:"Queso Mozzarella",c:4.0,u:"lascas"},
-  {p:"Sandwich de Jamón de Pavo Doble",i:"Queso Americano",c:4.0,u:"lascas"},
+  {p:"Sandwich de Jamón de Pavo Doble",i:"Jamon",c:8.0,u:"LASCA"},
+  {p:"Sandwich de Jamón de Pavo Doble",i:"Queso Mozzarella",c:4.0,u:"LASCA"},
+  {p:"Sandwich de Jamón de Pavo Doble",i:"Queso Americano",c:4.0,u:"LASCA"},
   
-  {p:"Sandwich de Jamón de Pavo Sencillo",i:"Jamon",c:4.0,u:"lascas"},
+  {p:"Sandwich de Jamón de Pavo Sencillo",i:"Jamon",c:4.0,u:"LASCA"},
   
-  {p:"Sandwich de Pollo Doble",i:"Pasta De Pollo",c:6.0,u:"oz"},
+  {p:"Sandwich de Pollo Doble",i:"Pasta De Pollo",c:6.0,u:"OZ"},
   
-  {p:"Sandwich de Pollo Sencillo",i:"Pasta De Pollo",c:3.0,u:"oz"},
+  {p:"Sandwich de Pollo Sencillo",i:"Pasta De Pollo",c:3.0,u:"OZ"},
   
   {p:"Shake de Chocolate 16 OZ",i:"Hershy Chocolate",c:1.5,u:"OZ"},
   {p:"Shake de Chocolate 20 OZ",i:"Hershy Chocolate",c:1.875,u:"OZ"},
-  {p:"Té de Taro",i:"Cup Chai",c:1.5,u:"unidad"},
-  {p:"Té Durazno",i:"Te Durazno",c:1.0,u:"unidad"},
-  {p:"Té Matcha",i:"Cup De Matcha",c:30.0,u:"gramos"},
+  {p:"Té de Taro",i:"Cup Chai",c:1.5,u:"UNIDAD"},
+  {p:"Té Durazno",i:"Te Durazno",c:1.0,u:"UNIDAD"},
+  {p:"Té Matcha",i:"Cup De Matcha",c:30.0,u:"GR"},
   {p:"Tiramisú Con Licor",i:"Tiramisu",c:1.0,u:"UNIDAD"},
   {p:"Tiramisú Sin Licor",i:"Tiramisu",c:1.0,u:"UNIDAD"},{p:"Mousse de Maracuya",i:"Mousse de Maracuya",c:1.0,u:"UNIDAD"},{p:"Mousse de Yogurt y Fresa",i:"Mousse de Yogurt y Fresa",c:1.0,u:"UNIDAD"},{p:"Tres Leches",i:"Tres Leches",c:1.0,u:"UNIDAD"},{p:"Saint Honoré",i:"Saint Honoré",c:1.0,u:"UNIDAD"},
-  {p:"Tostadas de Plátano",i:"Tostadas De Platano",c:0.65,u:"unidades"},
+  
   {p:"Slushie Fruta y Yogurt 16 OZ",i:"Sirope (camiar por jarabe )",c:3.0,u:"OZ"},
   {p:"Slushie Fruta y Yogurt 16 OZ",i:"Cup De Yogurt",c:5.0,u:"FL/OZ"},
   {p:"Slushie Fruta y Yogurt 16 OZ",i:"Fruta Elección",c:1.0,u:"OPCIÓN"},
@@ -1012,12 +1016,10 @@ const REC=[{p:"Ciabatta de Jamón de Pavo",i:"Lechuga",c:0.1,u:"UNIDAD"},{p:"Cia
   {p:"Postre Sugar Free Frutos Rojos",i:"Postre Sugar Free Frutos Rojos",c:1.0,u:"UNIDAD"},
   {p:"Promo 2x1 Cappuccino Tradicional 8 OZ",i:"Café",c:20.0,u:"GR"},
   {p:"Promo 2x1 Cappuccino Tradicional 8 OZ",i:"Leche",c:12.0,u:"OZ"},
-  {p:"Panini Pesto Evento Infantil",i:"Pan Ciabbatta",c:1.0,u:"unidades"},
   {p:"Panini Pesto Evento Infantil",i:"Pechuga Deshuesada Sello De Oro",c:1,u:"UNIDAD"},
-  {p:"Panini Pesto Evento Infantil",i:"Pesto De Albahaca",c:1.0,u:"oz"},
-  {p:"Panini Pesto Mini Evento",i:"Pan Ciabbatta",c:1.0,u:"unidades"},
+  {p:"Panini Pesto Evento Infantil",i:"Pesto De Albahaca",c:1.0,u:"OZ"},
   {p:"Panini Pesto Mini Evento",i:"Pechuga Deshuesada Sello De Oro",c:1,u:"UNIDAD"},
-  {p:"Panini Pesto Mini Evento",i:"Pesto De Albahaca",c:1.0,u:"oz"},
+  {p:"Panini Pesto Mini Evento",i:"Pesto De Albahaca",c:1.0,u:"OZ"},
   {p:"Botella de Vino",i:"Botella de Vino",c:1.0,u:"UNIDAD"},
 ];
 
@@ -2849,13 +2851,13 @@ async function borrarCache(){
         <span>Total pagado a proveedores</span><span style="color:#C0392B">$${totalCan.toFixed(2)}</span>
       </div>
     </div>`:"<p style='font-size:12px;color:#7A6A5A;margin-bottom:14px'>Sin facturas a proveedores ✓</p>"}
-    <div style="font-size:11px;font-weight:700;color:#7A6A5A;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Nuevo stock inicial</div>
-    <div style="max-height:150px;overflow-y:auto;margin-bottom:16px">
-      ${newInv.filter(i=>i.s>0).map(i=>`<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px;border-bottom:1px solid #F0EBE3">
-        <span>${i.n}</span><span style="font-weight:600;color:#2E7D52">${i.s} ${i.u}</span>
+    <div style="font-size:11px;font-weight:700;color:#7A6A5A;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Nuevo stock inicial (${newInv.length} ítems)</div>
+    <div style="max-height:280px;overflow-y:auto;margin-bottom:16px">
+      ${newInv.slice().sort((a,b)=>a.n.localeCompare(b.n)).map(i=>`<div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px;border-bottom:1px solid #F0EBE3">
+        <span style="${i.s<=0?'color:#C0392B':''}">${i.n}</span><span style="font-weight:600;color:${i.s<=0?'#C0392B':'#2E7D52'}">${i.s} ${i.u}</span>
       </div>`).join("")}
     </div>
-    <div style="display:flex;gap:8px">
+    <div class="no-print" style="display:flex;gap:8px">
       <button onclick="window.print()" style="flex:1;padding:10px;background:#1A5276;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:12px">🖨️ Imprimir</button>
       <button onclick="confirmarCache()" style="flex:1;padding:10px;background:#C0392B;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:12px">✓ Limpiar semana</button>
       <button onclick="document.getElementById('resumenSemanal').remove()" style="padding:10px 12px;background:#F0EBE3;color:#1A1A1A;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:12px">✕</button>
