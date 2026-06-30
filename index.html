@@ -1476,7 +1476,14 @@ const CAP_REC_DELETED_DEFAULT=[
   {p:"Saint Honoré",i:"Saint Honoré"},
   {p:"Panini Pesto Evento Infantil",i:"Pesto De Albahaca"},
   {p:"Panini Pesto Mini Evento",i:"Pesto De Albahaca"},
-  {p:"Botella de Vino",i:"Botella de Vino"}
+  {p:"Botella de Vino",i:"Botella de Vino"},
+  // Pasta de Pollo se convierte de OZ a UNIDAD (3 OZ = 1 UNIDAD) — se excluyen las versiones en OZ
+  {p:"Ciabatta de Pollo",i:"Pasta de Pollo"},{p:"Ciabatta de Pollo",i:"Pasta De Pollo"},
+  {p:"Mini Sandwichitos",i:"Pasta de Pollo"},{p:"Mini Sandwichitos",i:"Pasta De Pollo"},
+  {p:"Quesadilla de Pollo",i:"Pasta de Pollo"},{p:"Quesadilla de Pollo",i:"Pasta De Pollo"},
+  {p:"Quesadilla de Pollo Chipotle",i:"Pasta De Pollo"},
+  {p:"Sandwich de Pollo Doble",i:"Pasta de Pollo"},{p:"Sandwich de Pollo Doble",i:"Pasta De Pollo"},
+  {p:"Sandwich de Pollo Sencillo",i:"Pasta de Pollo"},{p:"Sandwich de Pollo Sencillo",i:"Pasta De Pollo"}
 ];
 // Recetas de Capistrano: redirecciones por fusión de duplicados (Leche Almendra→Leche de almendras, Pan Ciabatta→Pan Ciabbatta)
 const CAP_REC_CUSTOM_DEFAULT=[
@@ -1485,7 +1492,14 @@ const CAP_REC_CUSTOM_DEFAULT=[
   {p:"Leche Almendra",i:"Leche de almendras",c:2.0,u:"OZ"},
   {p:"Panini Chicken Chipotle",i:"Pan Ciabbatta",c:1.0,u:"UNIDAD"},
   {p:"Panini Pesto Evento Infantil",i:"Pan Ciabbatta",c:1.0,u:"UNIDAD"},
-  {p:"Panini Pesto Mini Evento",i:"Pan Ciabbatta",c:1.0,u:"UNIDAD"}
+  {p:"Panini Pesto Mini Evento",i:"Pan Ciabbatta",c:1.0,u:"UNIDAD"},
+  // Pasta De Pollo: 3 OZ = 1 UNIDAD (sencilla) · 6 OZ = 2 UNIDAD (doble)
+  {p:"Ciabatta de Pollo",i:"Pasta De Pollo",c:1.0,u:"UNIDAD"},
+  {p:"Mini Sandwichitos",i:"Pasta De Pollo",c:1.0,u:"UNIDAD"},
+  {p:"Quesadilla de Pollo",i:"Pasta De Pollo",c:1.0,u:"UNIDAD"},
+  {p:"Quesadilla de Pollo Chipotle",i:"Pasta De Pollo",c:1.0,u:"UNIDAD"},
+  {p:"Sandwich de Pollo Doble",i:"Pasta De Pollo",c:2.0,u:"UNIDAD"},
+  {p:"Sandwich de Pollo Sencillo",i:"Pasta De Pollo",c:1.0,u:"UNIDAD"}
 ];
 async function loadSucData(){
   const s=S.suc;
@@ -1589,6 +1603,14 @@ async function loadSucData(){
         return it;
       });
     }
+    // Pasta De Pollo: convertir unidad de OZ a UNIDAD (3 OZ = 1 UNIDAD), conservando el stock equivalente
+    filteredCap=filteredCap.map(it=>{
+      if(it.n==="Pasta De Pollo"&&it.u==="OZ"){
+        invChangedCap=true;
+        return{...it,u:"UNIDAD",s:r2(it.s/3)};
+      }
+      return it;
+    });
     if(invChangedCap){S.invBase=filteredCap;saveInv();}
   }
 }
