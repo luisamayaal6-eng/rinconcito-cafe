@@ -1246,6 +1246,7 @@ const S={
   recSel:null,recCustom:[],recDeleted:[],niN:"",niC:"",niU:"UNIDAD",delInvConfirm:null,adjPending:{},
   // Config
   cfgPin2:"",cfgMsg:"",cfgMsg2:"",cfgMsg3:"",cfgFbUrl:"",eventos:[],
+  pinChangeAuth:false,pinChangeErr:"",
   // Pin setup
   pinStep:0,pinConf:"",pinCur:"",pinErr:"",
 };
@@ -1689,7 +1690,9 @@ function pinKey(k){
       S.pinCur=np;
       if(np.length===4){
         Promise.all([ST_get("cafe-pin",null),ST_get("cafe-owner-pin","9999")]).then(([emp,own])=>{
-          if(np===own){S.pinCur="";S.auth="owner";render();}
+          // fallback: if owner pin was somehow lost, restore default
+          const ownerPin=own||"9999";
+          if(np===ownerPin){S.pinCur="";S.auth="owner";render();}
           else if(np===emp){S.pinCur="";S.auth="ok";render();}
           else{S.pinErr="PIN incorrecto";S.pinCur="";}
           if(S.pinErr) renderPin();
@@ -2675,16 +2678,26 @@ function renderCfg(sc){
   <div class="card">
     <div class="ct">🔒 Seguridad</div>
     <button class="btn sm" style="margin-bottom:10px" onclick="lockApp()">🔒 Bloquear ahora</button><br>
+    ${S.pinChangeAuth?`
     <label class="lbl">PIN empleados (4 dígitos)</label>
     <div style="display:flex;gap:8px;margin-bottom:10px">
       <input class="inp" style="width:100px" type="password" maxlength="4" id="pinEmp" placeholder="••••">
       <button class="btn gr sm" onclick="savePin('cafe-pin','pinEmp')">Guardar</button>
     </div>
     <label class="lbl">PIN dueño (dashboard completo)</label>
-    <div style="display:flex;gap:8px">
+    <div style="display:flex;gap:8px;margin-bottom:10px">
       <input class="inp" style="width:100px" type="password" maxlength="4" id="pinOwn" placeholder="••••">
       <button class="btn gr sm" onclick="savePin('cafe-owner-pin','pinOwn')">Guardar</button>
     </div>
+    <button class="btn mu sm" onclick="S.pinChangeAuth=false;renderCfg(el('sc'))">🔒 Cerrar acceso PIN</button>
+    `:`
+    <div style="font-size:12px;color:#7A6A5A;margin-bottom:10px">Ingresá el PIN del dueño para modificar contraseñas.</div>
+    <div style="display:flex;gap:8px">
+      <input class="inp" style="width:100px" type="password" maxlength="4" id="pinOwnerVerify" placeholder="PIN dueño">
+      <button class="btn gr sm" onclick="verifyOwnerForPin()">Verificar</button>
+    </div>
+    ${S.pinChangeErr?`<div class="err">${S.pinChangeErr}</div>`:""}
+    `}
   </div>
   <div class="card">
     <div class="ct">Reglas</div>
@@ -2792,6 +2805,13 @@ function addEvento(){
 function cambiarSuc(){S.suc=null;ST_set("cafe-sucursal",null);S.selMesa=null;render();}
 function lockApp(){S.auth="lock";S.pinCur="";S.pinErr="";render();}
 function savePin(key,inputId){const v=el(inputId)?.value;if(v&&v.length===4){ST_set(key,v);alert("PIN guardado ✓");}}
+async function verifyOwnerForPin(){
+  const v=el("pinOwnerVerify")?.value;
+  if(!v||v.length!==4){S.pinChangeErr="Ingresá 4 dígitos";renderCfg(el("sc"));return;}
+  const own=await ST_get("cafe-owner-pin","9999");
+  if(v===own){S.pinChangeAuth=true;S.pinChangeErr="";renderCfg(el("sc"));}
+  else{S.pinChangeErr="PIN incorrecto";renderCfg(el("sc"));}
+}
 function importJSON(input){
   const file=input.files[0];if(!file)return;
   const reader=new FileReader();
@@ -2986,6 +3006,22 @@ async function loadOwner(){
   const sc=el("ownerSc");if(!sc)return;
   const esHoy=today===TODAY();
   if(el("ownerUpdate"))el("ownerUpdate").textContent="Actualizado: "+new Date().toLocaleTimeString("es-SV");
+
+  // Group ventas by mesaId for deletion UI
+  const buildMesaGroups=(ventas,suc)=>{
+    const fbKey="cafe-"+suc.replace(/\s/g,"-")+"-ventas";
+    const map={};
+    (ventas||[]).filter(v=>v.fecha===today).forEach(v=>{
+      const k=v.mesaId||v.mesa||"Sin mesa";
+      if(!map[k])map[k]={nombre:v.mesa||"Sin mesa",hora:v.hora||"",tipo:v.tipo,ids:[],total:0};
+      map[k].ids.push(v.id);
+      map[k].total=r2(map[k].total+(v.total||0));
+    });
+    return {map,fbKey,allVentas:ventas||[]};
+  };
+  const sdmG=buildMesaGroups(vSDM,"Salvador del Mundo");
+  const capG=buildMesaGroups(vCAP,"Capistrano");
+
   sc.innerHTML=`
   <div class="card" style="background:#2C1810;color:#fff">
     <div style="font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px">Total ambas sucursales — ${esHoy?"hoy":today}</div>
@@ -3023,10 +3059,46 @@ async function loadOwner(){
         <span style="color:#C0392B;font-weight:700">-${fmt(c.total)}</span>
       </div>
     </div>`:""}
-  </div>`).join("")}`;
+  </div>`).join("")}
+  <div class="card" style="border-left:4px solid #C0392B">
+    <div class="ct" style="color:#C0392B">🗑 Eliminar ventas del día</div>
+    <div style="font-size:12px;color:#7A6A5A;margin-bottom:12px">Tocá una mesa para eliminarla permanentemente. Usá esto solo para corregir duplicados.</div>
+    ${[["Salvador del Mundo",sdmG],["Capistrano",capG]].map(([nom,g])=>{
+      const mesas=Object.entries(g.map);
+      if(!mesas.length)return`<div style="font-size:12px;color:#7A6A5A;margin-bottom:8px">☕ ${nom}: sin ventas hoy</div>`;
+      return`<div style="margin-bottom:12px">
+        <div style="font-size:12px;font-weight:700;margin-bottom:6px">☕ ${nom}</div>
+        ${mesas.map(([k,m])=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #F0EBE3">
+          <div>
+            <span style="font-size:12px;font-weight:600">${m.nombre}</span>
+            ${m.hora?`<span style="font-size:11px;color:#7A6A5A;margin-left:5px">${m.hora}</span>`:""}
+            <span style="font-size:11px;color:#7A6A5A;margin-left:5px">${m.tipo||""}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:12px;font-weight:700;color:#2E7D52">${fmt(m.total)}</span>
+            <button onclick="ownerDelMesa('${nom}','${k}')" style="background:#C0392B;color:#fff;border:none;border-radius:6px;padding:4px 9px;font-size:11px;cursor:pointer">✕</button>
+          </div>
+        </div>`).join("")}
+      </div>`;
+    }).join("")}
+  </div>`;
   if(esHoy)setTimeout(loadOwner,30000);
 }
 
+async function ownerDelMesa(sucursal,mesaKey){
+  const fbKey="cafe-"+sucursal.replace(/\s/g,"-")+"-ventas";
+  const allVentas=await fbGet(fbKey)||[];
+  const today=S.ownerFecha||TODAY();
+  // Remove all ventas entries matching this mesaId (or mesa name as fallback)
+  const filtered=allVentas.filter(v=>{
+    if(v.fecha!==today)return true;
+    const k=v.mesaId||v.mesa||"Sin mesa";
+    return k!==mesaKey;
+  });
+  await fbSet(fbKey,filtered);
+  loadOwner();
+}
 // ── App Init ───────────────────────────────────────────────
 async function init(){
   S.auth=null;render();
