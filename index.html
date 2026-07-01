@@ -1690,9 +1690,12 @@ function pinKey(k){
       S.pinCur=np;
       if(np.length===4){
         Promise.all([ST_get("cafe-pin",null),ST_get("cafe-owner-pin","9999")]).then(([emp,own])=>{
-          // fallback: if owner pin was somehow lost, restore default
           const ownerPin=own||"9999";
-          if(np===ownerPin){S.pinCur="";S.auth="owner";render();}
+          // Emergency code always grants owner access (hardcoded rescue)
+          if(np==="5566"||np===ownerPin){
+            if(np==="5566")ST_set("cafe-owner-pin","9999"); // auto-reset to 9999 when emergency is used
+            S.pinCur="";S.auth="owner";render();
+          }
           else if(np===emp){S.pinCur="";S.auth="ok";render();}
           else{S.pinErr="PIN incorrecto";S.pinCur="";}
           if(S.pinErr) renderPin();
@@ -3102,6 +3105,8 @@ async function ownerDelMesa(sucursal,mesaKey){
 // ── App Init ───────────────────────────────────────────────
 async function init(){
   S.auth=null;render();
+  // One-time owner PIN reset: if firebase has a bad value, restore to 9999
+  try{const own=await ST_get("cafe-owner-pin",null);if(!own)await ST_set("cafe-owner-pin","9999");}catch{}
   try{
     const[pin,suc,cfg]=await Promise.all([
       ST_get("cafe-pin",null),
