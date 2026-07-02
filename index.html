@@ -2113,35 +2113,36 @@ function confirmarPago(mesaId){
 }
 
 // ── Ticket Print ───────────────────────────────────────────
-function buildTicketHTML(items,mesaNombre,mesaTipo,tot,propMesa,descM,neto,pagos,sucursal,copies){
+function buildTicketHTML(items,mesaNombre,mesaTipo,baseTotal,propMesa,descM,neto,pagos,sucursal,copies){
   const now=new Date();
   const fecha=now.toLocaleDateString("es-SV",{day:"2-digit",month:"2-digit",year:"numeric"});
   const hora=now.toLocaleTimeString("es-SV",{hour:"2-digit",minute:"2-digit"});
-  const sep="─".repeat(30);
+  // Always recalculate propina from base total to avoid rounding errors from distributed per-item prop
+  const propReal=mesaTipo==="Ventas"?r2(baseTotal*0.10):0;
+  const netoReal=neto||r2(baseTotal+propReal-descM);
   const line=(a,b)=>`<div style="display:flex;justify-content:space-between"><span>${a}</span><span>${b}</span></div>`;
   const body=`
     <div style="text-align:center;font-weight:700;font-size:13px;margin-bottom:2px">Rinconcito del Café</div>
     <div style="text-align:center;font-size:11px;margin-bottom:2px">${sucursal||""}</div>
     <div style="text-align:center;font-size:10px;color:#555">${fecha} ${hora}</div>
     <div style="text-align:center;font-size:11px;margin:2px 0">${mesaNombre} · ${mesaTipo}</div>
-    <div style="border-top:1px dashed #000;margin:4px 0"></div>
+    <div style="border-top:1px dashed #000;margin:5px 0"></div>
     ${(items||[]).map(i=>`<div style="display:flex;justify-content:space-between;font-size:11px">
       <span>${i.cant||i.cantidad||1}× ${i.name||i.producto}</span><span>$${Number(i.total||0).toFixed(2)}</span>
     </div>`).join("")}
-    <div style="border-top:1px dashed #000;margin:4px 0"></div>
-    ${propMesa>0?line("Subtotal","$"+tot.toFixed(2)):""}
-    ${propMesa>0?line("Propina 10%","+$"+propMesa.toFixed(2)):""}
-    ${descM>0?line("Descuento","-$"+descM.toFixed(2)):""}
+    <div style="border-top:1px dashed #000;margin:5px 0"></div>
+    ${propReal>0.005?line("Subtotal","$"+baseTotal.toFixed(2)):""}
+    ${propReal>0.005?line("Propina 10%","+$"+propReal.toFixed(2)):""}
+    ${descM>0.005?line("Descuento","-$"+descM.toFixed(2)):""}
     <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;margin:3px 0">
-      <span>TOTAL</span><span>$${neto.toFixed(2)}</span>
+      <span>TOTAL</span><span>$${netoReal.toFixed(2)}</span>
     </div>
-    <div style="border-top:1px dashed #000;margin:4px 0"></div>
+    <div style="border-top:1px dashed #000;margin:5px 0"></div>
     ${(pagos||[]).map(p=>`<div style="display:flex;justify-content:space-between;font-size:11px">
       <span>${p.metodo}</span><span>$${Number(p.monto||0).toFixed(2)}</span>
     </div>`).join("")}
-    <div style="border-top:1px dashed #000;margin:4px 0"></div>
-    <div style="text-align:center;font-size:10px;margin-top:4px">¡Gracias por su visita!</div>
-    <div style="text-align:center;font-size:10px">rinconcito-cafe.vercel.app</div>`;
+    <div style="text-align:center;font-size:11px;font-weight:600;margin-top:8px">¡Gracias por su visita!</div>
+    <div style="height:20mm"></div>`;
   let copies_html="";
   for(let i=0;i<(copies||1);i++) copies_html+=`<div class="ticket-copy">${body}</div>`;
   return`<div id="ticketPrint">${copies_html}</div>`;
