@@ -69,7 +69,12 @@ button,input,select{font-family:inherit}
   #resumenSemanal{position:absolute;inset:0;background:#fff;padding:0}
   #resumenPrint{max-height:none;overflow:visible;box-shadow:none;max-width:100%}
   #resumenPrint button,#resumenPrint .no-print{display:none!important}
+  #ticketPrint,#ticketPrint *{visibility:visible}
+  #ticketPrint{position:fixed;top:0;left:0;width:80mm;background:#fff;padding:4mm 3mm}
+  .ticket-copy{page-break-after:always;width:74mm;font-family:monospace;font-size:11px;color:#000}
+  .ticket-copy:last-child{page-break-after:auto}
 }
+@page{size:80mm auto;margin:0}
 </style>
 </head>
 <body>
@@ -1246,7 +1251,7 @@ const S={
   recSel:null,recCustom:[],recDeleted:[],niN:"",niC:"",niU:"UNIDAD",delInvConfirm:null,adjPending:{},
   // Config
   cfgPin2:"",cfgMsg:"",cfgMsg2:"",cfgMsg3:"",cfgFbUrl:"",eventos:[],
-  pinChangeAuth:false,pinChangeErr:"",
+  pinChangeAuth:false,pinChangeErr:"",ticketCopias:1,
   // Pin setup
   pinStep:0,pinConf:"",pinCur:"",pinErr:"",
 };
@@ -1727,8 +1732,8 @@ function render(){
   try{
     if(S.auth===null){el("app").innerHTML=`<div class="loading">☕ Cargando...</div>`;return;}
     if(S.auth==="pin"||S.auth==="lock"){renderPin();return;}
-    if(S.auth==="suc"||!S.suc){renderSuc();return;}
     if(S.auth==="owner"){renderOwner();return;}
+    if(S.auth==="suc"||!S.suc){renderSuc();return;}
     el("app").innerHTML=hdrHTML()+`<div class="sc" id="sc"></div>`+navHTML();
     const sc=el("sc");
     if(S.tab==="pos") renderPOS(sc);
@@ -2032,7 +2037,15 @@ function pagoModal(mesa){
         <span style="font-weight:700;color:${rest>0.01?"#C0392B":"#2E7D52"}">${fmt(rest)}</span>
       </div>
     </div>`}
-    <button class="btn gr" style="width:100%;justify-content:center;padding:12px;opacity:${S.pagoModo==="mixto"&&rest>0.01?.5:1}" onclick="confirmarPago('${mesa.id}')">✓ Confirmar cobro</button>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn" style="flex:1;justify-content:center;padding:11px;background:#1A5276;color:#fff" onclick="printTicket('${mesa.id}',${S.ticketCopias||1})">🖨️ Imprimir ticket</button>
+      <select class="inp" style="width:70px" onchange="S.ticketCopias=parseInt(this.value)">
+        <option value="1">1 copia</option>
+        <option value="2">2 copias</option>
+        <option value="3">3 copias</option>
+      </select>
+    </div>
+    <button class="btn gr" style="width:100%;justify-content:center;padding:12px;margin-top:8px;opacity:${S.pagoModo==="mixto"&&rest>0.01?.5:1}" onclick="confirmarPago('${mesa.id}')">✓ Confirmar cobro</button>
   </div></div>`;
 }
 function closePago(e){if(e.target.classList.contains("ov")){S.showPago=false;renderMesaDetalle(el("sc"));}}
@@ -2076,9 +2089,94 @@ function confirmarPago(mesaId){
   });
   S.ventas.push(...entries);saveVentas();
   S.mesas=S.mesas.map(m=>m.id===mesaId?{...m,estado:"cerrada"}:m);saveMesas();
-  S.showPago=false;S.selMesa=null;render();
+  // Print receipt after payment if user wants
+  const printAfter=()=>{
+    printTicketFromEntries(entries,mesa,neto,pagos,S.ticketCopias||1);
+    S.showPago=false;S.selMesa=null;render();
+  };
+  S.showPago=false;S.selMesa=null;
+  // Show brief print prompt then go back
+  el("app").innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;padding:24px;background:#FBF7F2">
+    <div style="font-size:22px">✓ Cobro confirmado</div>
+    <div style="font-size:18px;font-weight:800;color:#2E7D52">${fmt(neto)}</div>
+    <div style="font-size:13px;color:#7A6A5A">${mesa.nombre} · ${mesa.tipo}</div>
+    <div style="display:flex;gap:10px;margin-top:8px">
+      <select class="inp" style="width:90px" onchange="S.ticketCopias=parseInt(this.value)">
+        <option value="1">1 copia</option>
+        <option value="2">2 copias</option>
+        <option value="3">3 copias</option>
+      </select>
+      <button class="btn" style="background:#1A5276;color:#fff;padding:12px 20px;font-size:14px" onclick="printTicketFromEntries(${JSON.stringify(entries)},${JSON.stringify(mesa)},${neto},${JSON.stringify(pagos)},S.ticketCopias||1)">🖨️ Imprimir ticket</button>
+    </div>
+    <button class="btn mu" style="padding:12px 24px;font-size:14px" onclick="render()">Volver a mesas</button>
+  </div>`;
 }
 
+// ── Ticket Print ───────────────────────────────────────────
+function buildTicketHTML(items,mesaNombre,mesaTipo,tot,propMesa,descM,neto,pagos,sucursal,copies){
+  const now=new Date();
+  const fecha=now.toLocaleDateString("es-SV",{day:"2-digit",month:"2-digit",year:"numeric"});
+  const hora=now.toLocaleTimeString("es-SV",{hour:"2-digit",minute:"2-digit"});
+  const sep="─".repeat(30);
+  const line=(a,b)=>`<div style="display:flex;justify-content:space-between"><span>${a}</span><span>${b}</span></div>`;
+  const body=`
+    <div style="text-align:center;font-weight:700;font-size:13px;margin-bottom:2px">Rinconcito del Café</div>
+    <div style="text-align:center;font-size:11px;margin-bottom:2px">${sucursal||""}</div>
+    <div style="text-align:center;font-size:10px;color:#555">${fecha} ${hora}</div>
+    <div style="text-align:center;font-size:11px;margin:2px 0">${mesaNombre} · ${mesaTipo}</div>
+    <div style="border-top:1px dashed #000;margin:4px 0"></div>
+    ${(items||[]).map(i=>`<div style="display:flex;justify-content:space-between;font-size:11px">
+      <span>${i.cant||i.cantidad||1}× ${i.name||i.producto}</span><span>$${Number(i.total||0).toFixed(2)}</span>
+    </div>`).join("")}
+    <div style="border-top:1px dashed #000;margin:4px 0"></div>
+    ${propMesa>0?line("Subtotal","$"+tot.toFixed(2)):""}
+    ${propMesa>0?line("Propina 10%","+$"+propMesa.toFixed(2)):""}
+    ${descM>0?line("Descuento","-$"+descM.toFixed(2)):""}
+    <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;margin:3px 0">
+      <span>TOTAL</span><span>$${neto.toFixed(2)}</span>
+    </div>
+    <div style="border-top:1px dashed #000;margin:4px 0"></div>
+    ${(pagos||[]).map(p=>`<div style="display:flex;justify-content:space-between;font-size:11px">
+      <span>${p.metodo}</span><span>$${Number(p.monto||0).toFixed(2)}</span>
+    </div>`).join("")}
+    <div style="border-top:1px dashed #000;margin:4px 0"></div>
+    <div style="text-align:center;font-size:10px;margin-top:4px">¡Gracias por su visita!</div>
+    <div style="text-align:center;font-size:10px">rinconcito-cafe.vercel.app</div>`;
+  let copies_html="";
+  for(let i=0;i<(copies||1);i++) copies_html+=`<div class="ticket-copy">${body}</div>`;
+  return`<div id="ticketPrint">${copies_html}</div>`;
+}
+function printTicket(mesaId,copies){
+  const mesa=S.mesas.find(m=>m.id===mesaId);if(!mesa)return;
+  const items=mesa.items||[];
+  const tot=r2(items.reduce((s,i)=>s+(i.total||0),0));
+  const propMesa=mesa.tipo==="Ventas"?r2(tot*0.10):0;
+  const descM=mesa.tipo==="Pedidos Ya"?(parseFloat(S.pagoPY)||0):0;
+  const neto=r2(tot+propMesa-descM);
+  const metodo=S.pagoModo==="simple"?S.pagoMet:"Mixto";
+  const pagos=S.pagoModo==="simple"?[{metodo:S.pagoMet,monto:neto}]:[
+    ...(parseFloat(S.pagoEf)>0?[{metodo:"Efectivo",monto:parseFloat(S.pagoEf)}]:[]),
+    ...(parseFloat(S.pagoTar)>0?[{metodo:"Tarjeta",monto:parseFloat(S.pagoTar)}]:[]),
+    ...(parseFloat(S.pagoTr)>0?[{metodo:"Transferencia",monto:parseFloat(S.pagoTr)}]:[]),
+  ];
+  const div=document.createElement("div");
+  div.innerHTML=buildTicketHTML(items,mesa.nombre,mesa.tipo,tot,propMesa,descM,neto,pagos,S.suc,copies);
+  document.body.appendChild(div);
+  window.print();
+  document.body.removeChild(div);
+}
+function printTicketFromEntries(entries,mesa,neto,pagos,copies){
+  // Group entries back into items for display
+  const items=entries.map(e=>({cant:e.cantidad,name:e.producto,total:e.total}));
+  const tot=r2(entries.reduce((s,e)=>s+(e.sub||e.total||0),0));
+  const propMesa=r2(entries.reduce((s,e)=>s+(e.prop||0),0));
+  const descM=r2(entries.reduce((s,e)=>s+(e.desc||0),0));
+  const div=document.createElement("div");
+  div.innerHTML=buildTicketHTML(items,mesa.nombre,mesa.tipo,tot,propMesa,descM,neto,pagos,S.suc,copies||1);
+  document.body.appendChild(div);
+  window.print();
+  document.body.removeChild(div);
+}
 // ── Resumen View ───────────────────────────────────────────
 function renderRes(sc){
   const fecha=S.resFecha||TODAY();
