@@ -3219,6 +3219,13 @@ async function loadOwner(){
         </div>`).join("")}
       </div>`;
     }).join("")}
+  </div>
+  <div class="card" style="border-left:4px solid #2E7D52">
+    <div class="ct" style="color:#2E7D52">✏️ Editar registros</div>
+    <div style="font-size:12px;color:#7A6A5A;margin-bottom:12px">Editá o eliminá cualquier registro de ventas, ingresos, mermas, eventos o facturas.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      ${["Salvador del Mundo","Capistrano"].map(s=>`<button onclick="ownerOpenEditor('${s}','ventas')" style="padding:10px;background:#F0EBE3;border:1px solid #C9956B;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;text-align:center">☕ ${s}</button>`).join("")}
+    </div>
   </div>`;
   if(esHoy)setTimeout(loadOwner,30000);
 }
@@ -3227,7 +3234,6 @@ async function ownerDelMesa(sucursal,mesaKey){
   const fbKey="cafe-"+sucursal.replace(/\s/g,"-")+"-ventas";
   const allVentas=await fbGet(fbKey)||[];
   const today=S.ownerFecha||TODAY();
-  // Remove all ventas entries matching this mesaId (or mesa name as fallback)
   const filtered=allVentas.filter(v=>{
     if(v.fecha!==today)return true;
     const k=v.mesaId||v.mesa||"Sin mesa";
@@ -3235,6 +3241,153 @@ async function ownerDelMesa(sucursal,mesaKey){
   });
   await fbSet(fbKey,filtered);
   loadOwner();
+}
+
+// ── Owner Edit Records ─────────────────────────────────────
+// State for editor
+const OE={suc:null,type:null,data:[],editing:null,fbKey:null};
+
+async function ownerOpenEditor(sucursal,type){
+  OE.suc=sucursal;OE.type=type;OE.editing=null;
+  OE.fbKey="cafe-"+sucursal.replace(/\s/g,"-")+"-"+type;
+  OE.data=await fbGet(OE.fbKey)||[];
+  ownerRenderEditor();
+}
+
+function ownerRenderEditor(){
+  const fecha=S.ownerFecha||TODAY();
+  const sc=el("ownerSc");if(!sc)return;
+  const dayData=OE.data.filter(r=>r.fecha===fecha);
+  const typeLabels={ventas:"🧾 Ventas",ingresos:"📦 Ingresos",mermas:"📉 Mermas",eventos:"🎉 Eventos",cancelaciones:"🧾 Facturas Proveedores"};
+  const sucursales=["Salvador del Mundo","Capistrano"];
+  const types=["ventas","ingresos","mermas","eventos","cancelaciones"];
+
+  sc.innerHTML=`
+  <div style="padding:4px 0 10px">
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+      ${sucursales.map(s=>`<button onclick="ownerOpenEditor('${s}','${OE.type||"ventas"}')"
+        style="padding:7px 12px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:600;
+        background:${OE.suc===s?"#2C1810":"#F0EBE3"};color:${OE.suc===s?"#fff":"#2C1810"}">☕ ${s}</button>`).join("")}
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+      ${types.map(t=>`<button onclick="ownerOpenEditor('${OE.suc||"Salvador del Mundo"}','${t}')"
+        style="padding:6px 10px;border-radius:8px;border:none;cursor:pointer;font-size:11px;font-weight:600;
+        background:${OE.type===t?"#2C1810":"#E5DDD5"};color:${OE.type===t?"#fff":"#2C1810"}">${typeLabels[t]||t}</button>`).join("")}
+    </div>
+    <div style="font-size:11px;color:#7A6A5A;margin-bottom:8px">${OE.suc} · ${typeLabels[OE.type||"ventas"]} · ${fecha} · ${dayData.length} registros</div>
+    <button onclick="ownerAddRecord()" style="background:#2E7D52;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;cursor:pointer;margin-bottom:10px">+ Agregar registro</button>
+    ${OE.editing==="new"?ownerEditForm(null):""}
+    ${dayData.length===0?`<div style="text-align:center;padding:20px;color:#7A6A5A;font-size:12px">Sin registros para esta fecha</div>`:""}
+    ${dayData.map(r=>`
+      <div style="background:#fff;border-radius:8px;margin-bottom:8px;overflow:hidden;border:1px solid #E5DDD5">
+        ${OE.editing===r.id?ownerEditForm(r):`
+        <div style="padding:10px 12px;display:flex;justify-content:space-between;align-items:center">
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:600">${ownerRecordTitle(r)}</div>
+            <div style="font-size:11px;color:#7A6A5A">${ownerRecordSub(r)}</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span style="font-weight:700;font-size:13px;color:#2E7D52">$${Number(r.total||r.monto||r.cant||0).toFixed(2)}</span>
+            <button onclick="OE.editing='${r.id}';ownerRenderEditor()" style="background:#1A5276;color:#fff;border:none;border-radius:6px;padding:4px 9px;font-size:11px;cursor:pointer">✏️</button>
+            <button onclick="ownerDelRecord('${r.id}')" style="background:#C0392B;color:#fff;border:none;border-radius:6px;padding:4px 9px;font-size:11px;cursor:pointer">✕</button>
+          </div>
+        </div>`}
+      </div>`).join("")}
+    <button onclick="loadOwner()" style="width:100%;margin-top:8px;padding:10px;background:#F0EBE3;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600">← Volver al resumen</button>
+  </div>`;
+}
+
+function ownerRecordTitle(r){
+  if(OE.type==="ventas") return `${r.cantidad||1}× ${r.producto||""} · ${r.mesa||""}`;
+  if(OE.type==="ingresos") return r.item||"Sin descripción";
+  if(OE.type==="mermas") return r.item||"Sin descripción";
+  if(OE.type==="eventos") return r.desc||"Sin descripción";
+  if(OE.type==="cancelaciones") return r.desc||"Sin descripción";
+  return r.desc||r.item||r.producto||"";
+}
+function ownerRecordSub(r){
+  const parts=[];
+  if(r.metodo)parts.push(r.metodo);
+  if(r.hora)parts.push(r.hora);
+  if(r.nota)parts.push(r.nota);
+  if(r.u)parts.push(r.u);
+  return parts.join(" · ")||"";
+}
+
+function ownerEditForm(r){
+  const isNew=!r;
+  const v=(f,d="")=>r?r[f]||d:d;
+  const fields={
+    ventas:`<div style="display:grid;gap:6px;padding:10px">
+      <input class="inp" id="oe_producto" placeholder="Producto" value="${v("producto")}">
+      <input class="inp" id="oe_mesa" placeholder="Mesa" value="${v("mesa")}">
+      <input class="inp" type="text" inputmode="decimal" id="oe_cantidad" placeholder="Cantidad" value="${v("cantidad",1)}">
+      <input class="inp" type="text" inputmode="decimal" id="oe_total" placeholder="Total $" value="${v("total")}">
+      <select class="inp" id="oe_metodo"><option ${v("metodo")==="Efectivo"?"selected":""}>Efectivo</option><option ${v("metodo")==="Tarjeta"?"selected":""}>Tarjeta</option><option ${v("metodo")==="Mixto"?"selected":""}>Mixto</option><option ${v("metodo")==="Transferencia"?"selected":""}>Transferencia</option></select>
+    </div>`,
+    ingresos:`<div style="display:grid;gap:6px;padding:10px">
+      <input class="inp" id="oe_item" placeholder="Ingrediente" value="${v("item")}">
+      <input class="inp" type="text" inputmode="decimal" id="oe_cant" placeholder="Cantidad" value="${v("cant")}">
+      <input class="inp" id="oe_nota" placeholder="Nota (opcional)" value="${v("nota")}">
+    </div>`,
+    mermas:`<div style="display:grid;gap:6px;padding:10px">
+      <input class="inp" id="oe_item" placeholder="Ingrediente" value="${v("item")}">
+      <input class="inp" type="text" inputmode="decimal" id="oe_cant" placeholder="Cantidad" value="${v("cant")}">
+      <input class="inp" id="oe_mot" placeholder="Motivo" value="${v("mot","Desperdicio")}">
+    </div>`,
+    eventos:`<div style="display:grid;gap:6px;padding:10px">
+      <input class="inp" id="oe_desc" placeholder="Descripción del evento" value="${v("desc")}">
+      <input class="inp" type="text" inputmode="decimal" id="oe_ef" placeholder="Efectivo $" value="${v("efectivo",0)}">
+      <input class="inp" type="text" inputmode="decimal" id="oe_tar" placeholder="Tarjeta $" value="${v("tarjeta",0)}">
+      <input class="inp" type="text" inputmode="decimal" id="oe_tr" placeholder="Transferencia $" value="${v("transferencia",0)}">
+    </div>`,
+    cancelaciones:`<div style="display:grid;gap:6px;padding:10px">
+      <input class="inp" id="oe_desc" placeholder="Descripción" value="${v("desc")}">
+      <input class="inp" type="text" inputmode="decimal" id="oe_monto" placeholder="Monto $" value="${v("monto")}">
+      <select class="inp" id="oe_metodo"><option ${v("metodo")==="Efectivo"?"selected":""}>Efectivo</option><option ${v("metodo")==="Tarjeta"?"selected":""}>Tarjeta</option><option ${v("metodo")==="Transferencia"?"selected":""}>Transferencia</option></select>
+    </div>`,
+  };
+  return`<div style="background:#FBF7F2;padding:4px">
+    ${fields[OE.type]||""}
+    <div style="display:flex;gap:8px;padding:0 10px 10px">
+      <button onclick="ownerSaveRecord(${isNew?"null":"'"+r.id+"'"})" style="flex:1;padding:8px;background:#2E7D52;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600">✓ Guardar</button>
+      <button onclick="OE.editing=null;ownerRenderEditor()" style="padding:8px 14px;background:#E5DDD5;border:none;border-radius:8px;cursor:pointer;font-size:12px">Cancelar</button>
+    </div>
+  </div>`;
+}
+
+function ownerAddRecord(){OE.editing="new";ownerRenderEditor();}
+
+async function ownerSaveRecord(id){
+  const fecha=S.ownerFecha||TODAY();
+  const g=(elId)=>el(elId)?.value||"";
+  let record={id:id||uid(),fecha};
+  if(OE.type==="ventas"){
+    record={...record,producto:g("oe_producto"),mesa:g("oe_mesa"),
+      cantidad:parseFloat(g("oe_cantidad"))||1,total:parseFloat(g("oe_total"))||0,
+      metodo:g("oe_metodo"),tipo:record.tipo||"Ventas"};
+  }else if(OE.type==="ingresos"){
+    record={...record,item:g("oe_item"),cant:parseFloat(g("oe_cant"))||0,nota:g("oe_nota")};
+  }else if(OE.type==="mermas"){
+    record={...record,item:g("oe_item"),cant:parseFloat(g("oe_cant"))||0,mot:g("oe_mot")||"Desperdicio"};
+  }else if(OE.type==="eventos"){
+    const ef=parseFloat(g("oe_ef"))||0,tar=parseFloat(g("oe_tar"))||0,tr=parseFloat(g("oe_tr"))||0;
+    const mets=[ef>0?"Efectivo":"",tar>0?"Tarjeta":"",tr>0?"Transferencia":""].filter(Boolean);
+    record={...record,desc:g("oe_desc"),efectivo:ef,tarjeta:tar,transferencia:tr,
+      total:r2(ef+tar+tr),metodo:mets.length>1?"Mixto ("+mets.join("+")+")":mets[0]||""};
+  }else if(OE.type==="cancelaciones"){
+    record={...record,desc:g("oe_desc"),monto:parseFloat(g("oe_monto"))||0,metodo:g("oe_metodo")};
+  }
+  if(id){OE.data=OE.data.map(r=>r.id===id?{...r,...record}:r);}
+  else{OE.data.push(record);}
+  await fbSet(OE.fbKey,OE.data);
+  OE.editing=null;ownerRenderEditor();
+}
+
+async function ownerDelRecord(id){
+  OE.data=OE.data.filter(r=>r.id!==id);
+  await fbSet(OE.fbKey,OE.data);
+  OE.editing=null;ownerRenderEditor();
 }
 // ── App Init ───────────────────────────────────────────────
 async function init(){
