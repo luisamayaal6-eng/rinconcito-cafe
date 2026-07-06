@@ -2085,26 +2085,22 @@ function confirmarPago(mesaId){
   });
   S.ventas.push(...entries);saveVentas();
   S.mesas=S.mesas.map(m=>m.id===mesaId?{...m,estado:"cerrada"}:m);saveMesas();
-  // Print receipt after payment if user wants
-  const printAfter=()=>{
-    printTicketFromEntries(entries,mesa,neto,pagos,S.ticketCopias||1);
-    S.showPago=false;S.selMesa=null;render();
-  };
   S.showPago=false;S.selMesa=null;
-  // Show brief print prompt then go back
+  // Store last payment data globally so post-payment print works regardless of special chars
+  window._lastPayment={entries,mesa,neto,pagos};
   el("app").innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:16px;padding:24px;background:#FBF7F2">
-    <div style="font-size:22px">✓ Cobro confirmado</div>
+    <div style="font-size:28px">✓</div>
     <div style="font-size:18px;font-weight:800;color:#2E7D52">${fmt(neto)}</div>
     <div style="font-size:13px;color:#7A6A5A">${mesa.nombre} · ${mesa.tipo}</div>
-    <div style="display:flex;gap:10px;margin-top:8px">
+    <div style="display:flex;gap:10px;margin-top:8px;align-items:center">
       <select class="inp" style="width:90px" onchange="S.ticketCopias=parseInt(this.value)">
         <option value="1">1 copia</option>
         <option value="2">2 copias</option>
         <option value="3">3 copias</option>
       </select>
-      <button class="btn" style="background:#1A5276;color:#fff;padding:12px 20px;font-size:14px" onclick="printTicketFromEntries(${JSON.stringify(entries)},${JSON.stringify(mesa)},${neto},${JSON.stringify(pagos)},S.ticketCopias||1)">🖨️ Imprimir ticket</button>
+      <button class="btn" style="background:#1A5276;color:#fff;padding:12px 20px;font-size:14px" onclick="const lp=window._lastPayment;printTicketFromEntries(lp.entries,lp.mesa,lp.neto,lp.pagos,S.ticketCopias||1)">🖨️ Imprimir recibo</button>
     </div>
-    <button class="btn mu" style="padding:12px 24px;font-size:14px" onclick="render()">Volver a mesas</button>
+    <button class="btn mu" style="padding:12px 24px;font-size:14px;margin-top:4px" onclick="render()">← Volver a mesas</button>
   </div>`;
 }
 
