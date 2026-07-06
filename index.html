@@ -2878,7 +2878,10 @@ function renderCfg(sc){
           <div style="font-size:12px;font-weight:500">${e.desc}</div>
           <div style="font-size:11px;color:#7A6A5A">${e.fecha} · ${e.metodo}</div>
         </div>
-        <div style="font-weight:700;color:#2E7D52;font-size:13px">$${Number(e.total||0).toFixed(2)}</div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-weight:700;color:#2E7D52;font-size:13px">$${Number(e.total||0).toFixed(2)}</div>
+          <button onclick="printEventoRecibo(${JSON.stringify(e).replace(/"/g,'&quot;')})" style="background:#1A5276;color:#fff;border:none;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer">🖨️</button>
+        </div>
       </div>`).join("")}
     </div>`:""}
   </div>
@@ -2901,8 +2904,40 @@ function addEvento(){
   S.eventos=S.eventos||[];S.eventos.push(entry);
   ST_set(sk(S.suc,'eventos'),S.eventos);
   S.cfgMsg3='✓ Evento registrado — $'+total.toFixed(2);
-  setTimeout(()=>{S.cfgMsg3='';renderCfg(el('sc'));},3000);
+  setTimeout(()=>{S.cfgMsg3='';renderCfg(el('sc'));},4000);
   renderCfg(el('sc'));
+  // Show print dialog immediately after registering
+  printEventoRecibo(entry);
+}
+function printEventoRecibo(ev){
+  const now=new Date();
+  const fecha=now.toLocaleDateString("es-SV",{day:"2-digit",month:"2-digit",year:"numeric"});
+  const hora=now.toLocaleTimeString("es-SV",{hour:"2-digit",minute:"2-digit"});
+  const line=(a,b)=>`<div style="display:flex;justify-content:space-between;font-size:11px"><span>${a}</span><span>${b}</span></div>`;
+  const html=`<div id="ticketPrint"><div class="ticket-copy">
+    <div style="text-align:center;font-weight:700;font-size:13px;margin-bottom:2px">Rinconcito del Café</div>
+    <div style="text-align:center;font-size:11px;margin-bottom:2px">${S.suc||""}</div>
+    <div style="text-align:center;font-size:10px">${fecha} ${hora}</div>
+    <div style="border-top:1px dashed #000;margin:5px 0"></div>
+    <div style="text-align:center;font-size:11px;font-weight:700;margin:3px 0">🎉 RECIBO DE EVENTO</div>
+    <div style="text-align:center;font-size:11px;margin-bottom:4px">${ev.desc}</div>
+    <div style="border-top:1px dashed #000;margin:5px 0"></div>
+    ${ev.efectivo>0?line("Efectivo","$"+ev.efectivo.toFixed(2)):""}
+    ${ev.tarjeta>0?line("Tarjeta","$"+ev.tarjeta.toFixed(2)):""}
+    ${ev.transferencia>0?line("Transferencia","$"+ev.transferencia.toFixed(2)):""}
+    <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;margin:4px 0">
+      <span>TOTAL RECIBIDO</span><span>$${ev.total.toFixed(2)}</span>
+    </div>
+    <div style="border-top:1px dashed #000;margin:5px 0"></div>
+    <div style="text-align:center;font-size:10px">Fecha: ${ev.fecha}</div>
+    <div style="text-align:center;font-size:10px;font-weight:600;margin-top:6px">¡Gracias por elegirnos!</div>
+    <div style="height:20mm"></div>
+  </div></div>`;
+  const div=document.createElement("div");
+  div.innerHTML=html;
+  document.body.appendChild(div);
+  window.print();
+  document.body.removeChild(div);
 }
 function cambiarSuc(){S.suc=null;ST_set("cafe-sucursal",null);S.selMesa=null;render();}
 function lockApp(){S.auth="lock";S.pinCur="";S.pinErr="";render();}
