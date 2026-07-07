@@ -8,7 +8,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:system-ui,-apple-system,sans-serif;background:#FBF7F2;color:#1A1A1A}
-#app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+#app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}@media(min-width:720px){#app{max-width:100%}.sc{max-width:860px;margin:0 auto;width:100%}.nav{max-width:100%;left:0;transform:none}.mo{max-width:600px}.hdr{max-width:100%}}
 button,input,select{font-family:inherit}
 .hdr{background:#2C1810;color:#fff;padding:10px 13px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .sc{flex:1;overflow-y:auto;padding:10px 10px 82px}
@@ -1675,6 +1675,16 @@ function renderPin(){
     ${S.pinErr?`<div style="color:#C0392B;font-size:13px;font-weight:600">${S.pinErr}</div>`:""}
     <div class="pin-grid">${kHTML}</div>
   </div>`;
+  // Enable physical keyboard number keys for PIN entry
+  if(!window._pinKeyHandler){
+    window._pinKeyHandler=(e)=>{
+      if(S.auth!=="pin"&&S.auth!=="lock")return;
+      if(e.key>="0"&&e.key<="9")pinKey(e.key);
+      else if(e.key==="Backspace")pinKey("⌫");
+      else if(e.key==="Escape"){S.pinCur="";S.pinErr="";renderPin();}
+    };
+    document.addEventListener("keydown",window._pinKeyHandler);
+  }
 }
 function pinKey(k){
   if(k==="⌫"){S.pinCur=S.pinCur.slice(0,-1);S.pinErr="";}
@@ -2249,6 +2259,35 @@ function renderRes(sc){
     <div style="display:flex;justify-content:space-between;padding:10px 0 0;font-weight:700;font-size:16px">
       <span>TOTAL BRUTO</span><span style="color:#2E7D52">${fmt(totB)}</span>
     </div>
+    ${(()=>{
+      const ventasDia=dd.filter(v=>v.tipo==="Ventas");
+      const totProp=r2(ventasDia.reduce((s,v)=>s+(v.prop||0),0));
+      const totBase=r2(ventasDia.reduce((s,v)=>s+(v.sub||0),0));
+      if(totProp<0.01)return"";
+      return`<div style="border-top:1px solid #E5DDD5;margin-top:8px;padding-top:8px">
+        <div style="font-size:11px;font-weight:700;color:#7A6A5A;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Desglose Ventas Normales</div>
+        <div class="row"><span style="color:#7A6A5A;font-size:12px">Subtotal (sin propina)</span><span style="font-size:12px">${fmt(totBase)}</span></div>
+        <div class="row"><span style="color:#148C7C;font-size:12px">Propina 10% (${ventasDia.length} mesa${ventasDia.length!==1?"s":""})</span><span style="font-weight:700;color:#148C7C;font-size:12px">+${fmt(totProp)}</span></div>
+      </div>`;
+    })()}
+    ${(()=>{
+      const cDia=(S.cancelaciones||[]).filter(c=>c.fecha===fecha);
+      if(!cDia.length)return"";
+      const totCanc=r2(cDia.reduce((s,c)=>s+(c.monto||0),0));
+      const ef=r2(cDia.filter(c=>c.metodo==="Efectivo").reduce((s,c)=>s+(c.monto||0),0));
+      const tar=r2(cDia.filter(c=>c.metodo==="Tarjeta").reduce((s,c)=>s+(c.monto||0),0));
+      const tr=r2(cDia.filter(c=>c.metodo==="Transferencia").reduce((s,c)=>s+(c.monto||0),0));
+      return`<div style="border-top:1px solid #E5DDD5;margin-top:8px;padding-top:8px">
+        <div style="font-size:11px;font-weight:700;color:#7A6A5A;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Facturas a Proveedores (${cDia.length})</div>
+        ${ef>0?`<div class="row"><span style="color:#7A6A5A;font-size:12px">Efectivo</span><span style="font-size:12px;color:#C0392B">-${fmt(ef)}</span></div>`:""}
+        ${tar>0?`<div class="row"><span style="color:#7A6A5A;font-size:12px">Tarjeta</span><span style="font-size:12px;color:#C0392B">-${fmt(tar)}</span></div>`:""}
+        ${tr>0?`<div class="row"><span style="color:#7A6A5A;font-size:12px">Transferencia</span><span style="font-size:12px;color:#C0392B">-${fmt(tr)}</span></div>`:""}
+        <div class="row" style="margin-top:4px"><span style="font-weight:700;font-size:13px;color:#C0392B">Total pagado</span><span style="font-weight:700;font-size:13px;color:#C0392B">-${fmt(totCanc)}</span></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 0 0;font-weight:700;font-size:15px;border-top:1px solid #E5DDD5;margin-top:6px">
+          <span>NETO DEL DÍA</span><span style="color:#2E7D52">${fmt(r2(totB-totCanc))}</span>
+        </div>
+      </div>`;
+    })()}
   </div>
   ${top.length>0?`<div class="card"><div class="ct">Top productos</div>
     ${top.map(([p,c])=>`<div class="row" style="font-size:12px"><span style="flex:1">${p}</span><span style="font-weight:700;color:#C9956B">${c} uds.</span></div>`).join("")}
