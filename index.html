@@ -2261,9 +2261,12 @@ function renderRes(sc){
     </div>
     ${(()=>{
       const ventasDia=dd.filter(v=>v.tipo==="Ventas");
-      const totProp=r2(ventasDia.reduce((s,v)=>s+(v.prop||0),0));
       const cDia=(S.cancelaciones||[]).filter(c=>c.fecha===fecha);
+      const totVentas=r2(ventasDia.reduce((s,v)=>s+(v.total||0),0));
       const totCanc=r2(cDia.reduce((s,c)=>s+(c.monto||0),0));
+      // Propina = 10% of Ventas total (the amount shown in "Por Tipo")
+      const totProp=r2(totVentas*0.10);
+      const baseVentas=r2(totVentas-totProp);
       const subtotalSinProp=r2(totB-totProp);
       const neto=r2(totB-totProp-totCanc);
       const hasProp=totProp>=0.01;
@@ -2272,8 +2275,9 @@ function renderRes(sc){
       return`<div style="border-top:1px solid #E5DDD5;margin-top:8px;padding-top:8px">
         ${hasProp?`
         <div style="font-size:11px;font-weight:700;color:#7A6A5A;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px">Desglose Ventas Normales</div>
-        <div class="row"><span style="color:#148C7C;font-size:12px">Propina 10% (${ventasDia.length} mesa${ventasDia.length!==1?"s":""})</span><span style="font-weight:700;color:#148C7C;font-size:12px">+${fmt(totProp)}</span></div>
-        <div class="row" style="margin-top:4px"><span style="font-weight:600;font-size:13px">Subtotal sin propina</span><span style="font-weight:700;font-size:13px">${fmt(subtotalSinProp)}</span></div>`:""}
+        <div class="row"><span style="color:#7A6A5A;font-size:12px">Ventas (base sin propina)</span><span style="font-size:12px">${fmt(baseVentas)}</span></div>
+        <div class="row"><span style="color:#148C7C;font-size:12px">Propina 10% (${[...new Set(ventasDia.map(v=>v.mesaId||v.mesa))].length} mesas)</span><span style="font-weight:700;color:#148C7C;font-size:12px">+${fmt(totProp)}</span></div>
+        <div class="row" style="margin-top:4px"><span style="font-weight:600;font-size:13px">Subtotal sin propina (todos los tipos)</span><span style="font-weight:700;font-size:13px">${fmt(subtotalSinProp)}</span></div>`:""}
         ${hasCanc?`
         <div style="font-size:11px;font-weight:700;color:#7A6A5A;text-transform:uppercase;letter-spacing:.7px;margin:${hasProp?"10":"0"}px 0 6px">Facturas a Proveedores (${cDia.length})</div>
         ${cDia.map(c=>`<div class="row"><span style="color:#7A6A5A;font-size:12px">${c.desc||c.metodo||""}</span><span style="font-size:12px;color:#C0392B">-${fmt(c.monto||0)}</span></div>`).join("")}
