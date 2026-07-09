@@ -2289,21 +2289,18 @@ function renderRes(sc){
     })()}
   </div>
   ${(()=>{
-    // Remesa = Efectivo cobrado - Propinas en efectivo - Facturas canceladas en efectivo
+    // Remesa = Efectivo cobrado - Propinas totales (se pagan en cash a empleados) - Facturas en efectivo
     const ventasDia=dd.filter(v=>v.tipo==="Ventas");
     const totVentas=r2(ventasDia.reduce((s,v)=>s+(v.total||0),0));
     const totPropTotal=r2(totVentas*0.10);
-    const totEfVentas=r2(ventasDia.reduce((s,v)=>s+(v.efectivo||0),0));
-    // Distribute propina proportionally to efectivo fraction of Ventas
-    const propEf=totVentas>0?r2(totPropTotal*(totEfVentas/totVentas)):0;
     const cDia=(S.cancelaciones||[]).filter(c=>c.fecha===fecha);
     const cancEf=r2(cDia.filter(c=>c.metodo==="Efectivo").reduce((s,c)=>s+(c.monto||0),0));
-    const remesa=r2(totEf-propEf-cancEf);
+    const remesa=r2(totEf-totPropTotal-cancEf);
     return`<div class="card" style="border-left:4px solid #C9956B;background:#FFF8F3">
       <div style="font-size:11px;font-weight:700;color:#7A6A5A;text-transform:uppercase;letter-spacing:.7px;margin-bottom:10px">💰 Remesa del día</div>
       <div class="row"><span style="color:#7A6A5A;font-size:12px">Efectivo cobrado</span><span style="font-size:12px">${fmt(totEf)}</span></div>
-      ${propEf>0.01?`<div class="row"><span style="color:#148C7C;font-size:12px">Propinas en efectivo (empleados)</span><span style="font-size:12px;color:#148C7C">-${fmt(propEf)}</span></div>`:""}
-      ${cancEf>0.01?`<div class="row"><span style="color:#C0392B;font-size:12px">Facturas proveedores (efectivo)</span><span style="font-size:12px;color:#C0392B">-${fmt(cancEf)}</span></div>`:""}
+      ${totPropTotal>0.01?`<div class="row"><span style="color:#148C7C;font-size:12px">(-) Propinas empleados (10% Ventas)</span><span style="font-size:12px;color:#148C7C">-${fmt(totPropTotal)}</span></div>`:""}
+      ${cancEf>0.01?`<div class="row"><span style="color:#C0392B;font-size:12px">(-) Facturas proveedores (efectivo)</span><span style="font-size:12px;color:#C0392B">-${fmt(cancEf)}</span></div>`:""}
       <div style="display:flex;justify-content:space-between;padding:10px 0 0;font-weight:800;font-size:17px;border-top:1px solid #E5DDD5;margin-top:6px">
         <span style="color:#C9956B">REMESAR</span><span style="color:#C9956B">${fmt(remesa)}</span>
       </div>
