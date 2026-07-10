@@ -1252,7 +1252,7 @@ const S={
   recSel:null,recCustom:[],recDeleted:[],niN:"",niC:"",niU:"UNIDAD",delInvConfirm:null,adjPending:{},
   // Config
   cfgPin2:"",cfgMsg:"",cfgMsg2:"",cfgMsg3:"",cfgFbUrl:"",eventos:[],
-  pinChangeAuth:false,pinChangeErr:"",ticketCopias:1,
+  pinChangeAuth:false,pinChangeErr:"",ticketCopias:1,renamingMesa:null,
   // Pin setup
   pinStep:0,pinConf:"",pinCur:"",pinErr:"",
 };
@@ -1819,6 +1819,13 @@ function crearMesa(){
   S.mesas.push(m);saveMesas();S.showNueva=false;S.selMesa=m.id;render();
 }
 function abrirMesa(id){S.selMesa=id;render();}
+function saveMesaNombre(mesaId){
+  const inp=el("mesaRenameInp");
+  const nombre=(inp?.value||"").trim();
+  if(!nombre)return;
+  S.mesas=S.mesas.map(m=>m.id===mesaId?{...m,nombre}:m);
+  saveMesas();S.renamingMesa=null;renderMesaDetalle(el("sc"));
+}
 
 // ── Mesa Detalle ───────────────────────────────────────────
 function renderMesaDetalle(sc){
@@ -1839,7 +1846,7 @@ function renderMesaDetalle(sc){
   sc.innerHTML=`
   <div class="card" style="background:#2C1810;color:#fff">
     <div style="display:flex;justify-content:space-between;align-items:center">
-      <div><div style="font-size:16px;font-weight:800">${mesa.nombre}</div>
+      <div><div style="display:flex;align-items:center;gap:8px"><div style="font-size:16px;font-weight:800">${S.renamingMesa===mesa.id?'':`${mesa.nombre}`}</div>${S.renamingMesa===mesa.id?`<input id="mesaRenameInp" class="inp" style="font-size:14px;font-weight:700;padding:4px 8px;width:120px;background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.4);color:#fff" value="${mesa.nombre}" onkeydown="if(event.key==='Enter')saveMesaNombre('${mesa.id}')"><button onclick="saveMesaNombre('${mesa.id}')" style="background:#2E7D52;color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">✓</button><button onclick="S.renamingMesa=null;renderMesaDetalle(el('sc'))" style="background:rgba(255,255,255,.2);color:#fff;border:none;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer">✕</button>`:`<button onclick="S.renamingMesa='${mesa.id}';renderMesaDetalle(el('sc'))" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:rgba(255,255,255,.8);border-radius:6px;padding:2px 7px;font-size:10px;cursor:pointer">✏️</button>`}</div>
       <div style="font-size:11px;opacity:.7">${mesa.tipo} · ${mesa.items.length} ítems</div></div>
       <div style="text-align:right">
         <div style="font-size:21px;font-weight:800">${fmt(totalCobrar)}</div>
