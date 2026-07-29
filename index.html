@@ -3064,17 +3064,24 @@ function importJSON(input){
   reader.readAsText(file);input.value="";
 }
 async function borrarCache(){
+  const today=TODAY();
   const ALL_REC=[...REC.filter(r=>!S.recDeleted.some(d=>d.p===r.p&&d.i===r.i)),...S.recCustom];
+
+  // Only include data from PREVIOUS days in the cut calculation — today's data stays intact
+  const ventasCut=S.ventas.filter(v=>v.fecha!==today);
+  const ingresosCut=S.ingresos.filter(i=>i.fecha!==today);
+  const mermasCut=S.mermas.filter(m=>m.fecha!==today);
+
   const consumo={};
-  S.ventas.forEach(v=>{
+  ventasCut.forEach(v=>{
     if(v.cons&&typeof v.cons==="object"){
       Object.entries(v.cons).forEach(([k,amt])=>{consumo[k]=(consumo[k]||0)+(amt||0);});
     } else {
       ALL_REC.filter(r=>r.p===v.producto).forEach(r=>{const k=norm(r.i);consumo[k]=(consumo[k]||0)+r.c*(v.cantidad||1);});
     }
   });
-  const ingSum={};S.ingresos.forEach(i=>{const k=norm(i.item);ingSum[k]=(ingSum[k]||0)+i.cant;});
-  const merSum={};S.mermas.forEach(m=>{const k=norm(m.item);merSum[k]=(merSum[k]||0)+m.cant;});
+  const ingSum={};ingresosCut.forEach(i=>{const k=norm(i.item);ingSum[k]=(ingSum[k]||0)+i.cant;});
+  const merSum={};mermasCut.forEach(m=>{const k=norm(m.item);merSum[k]=(merSum[k]||0)+m.cant;});
   const newInv=(S.invBase||[]).map(item=>{
     const k=norm(item.n);
     const cons=Math.round((consumo[k]||0)*100)/100;
@@ -3083,9 +3090,10 @@ async function borrarCache(){
     const fin=Math.round((item.s+ing-cons-mer)*100)/100;
     return{...item,s:Math.max(0,fin)};
   });
-  const cans=S.cancelaciones||[];
+  const cans=(S.cancelaciones||[]).filter(c=>c.fecha!==today);
   const totalCan=r2(cans.reduce((s,c)=>s+(c.monto||0),0));
-  const totVentas=r2(S.ventas.reduce((s,v)=>s+(v.total||0),0));
+  const totVentas=r2(ventasCut.reduce((s,v)=>s+(v.total||0),0));
+  const diasCut=[...new Set(ventasCut.map(v=>v.fecha))].length;
   const semana=new Date().toLocaleDateString("es-SV",{day:"numeric",month:"long",year:"numeric"});
   window._newInvCache=newInv;
 
@@ -3097,6 +3105,7 @@ async function borrarCache(){
     <div style="text-align:center;margin-bottom:16px">
       <div style="font-size:18px;font-weight:800;color:#2C1810">☕ Resumen Semanal</div>
       <div style="font-size:12px;color:#7A6A5A">${S.suc} — ${semana}</div>
+      <div style="font-size:11px;color:#2E7D52;margin-top:4px">✓ Los datos de hoy (${today}) se conservan</div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px">
       <div style="background:#F0EBE3;border-radius:8px;padding:10px;text-align:center">
@@ -3141,20 +3150,29 @@ async function confirmarCache(){
   const newInv=window._newInvCache;
   if(!newInv)return;
   document.getElementById("resumenSemanal")?.remove();
+  const today=TODAY();
+  // Keep today's data — only clear previous days
+  const todayVentas=S.ventas.filter(v=>v.fecha===today);
+  const todayIngresos=S.ingresos.filter(i=>i.fecha===today);
+  const todayMermas=S.mermas.filter(m=>m.fecha===today);
+  const todayCancelaciones=(S.cancelaciones||[]).filter(c=>c.fecha===today);
   S.invBase=newInv;
-  S.ventas=[];S.ingresos=[];S.mermas=[];S.cancelaciones=[];
+  S.ventas=todayVentas;
+  S.ingresos=todayIngresos;
+  S.mermas=todayMermas;
+  S.cancelaciones=todayCancelaciones;
   S.mesas=S.mesas.map(m=>({...m,estado:"cerrada"}));
   S.selMesa=null;
   await Promise.all([
     ST_set(sk(S.suc,"inv_base"),newInv),
-    ST_set(sk(S.suc,"ventas"),[]),
-    ST_set(sk(S.suc,"ingresos"),[]),
-    ST_set(sk(S.suc,"mermas"),[]),
-    ST_set(sk(S.suc,"cancelaciones"),[]),
+    ST_set(sk(S.suc,"ventas"),todayVentas),
+    ST_set(sk(S.suc,"ingresos"),todayIngresos),
+    ST_set(sk(S.suc,"mermas"),todayMermas),
+    ST_set(sk(S.suc,"cancelaciones"),todayCancelaciones),
     ST_set(sk(S.suc,"mesas"),S.mesas),
   ]);
   S.tab="inv";render();
-  alert("✓ Semana cerrada.\nNuevo stock inicial guardado.\nDatos de la semana borrados.");
+  alert(`✓ Corte realizado.\nNuevo stock inicial guardado.\nDatos de días anteriores borrados.\nLos registros de hoy (${today}) se conservaron.`);
 }
 
 function addCancel(){
