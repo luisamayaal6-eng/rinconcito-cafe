@@ -179,7 +179,7 @@ const INV_BASE={
     {n:"Dijon",u:"OZ",s:54.0},
     {n:"Fanta",u:"UNIDAD",s:34.0},
     {n:"Flan De Queso",u:"UNIDAD",s:12.0},
-    {n:"Fresas",u:"UNIDAD",s:232.0},
+    {n:"Fresas",u:"UNIDAD",s:232.0},{n:"Fresas Cocina",u:"OZ",s:0.0},
     {n:"Fresca",u:"UNIDAD",s:17.0},
     {n:"Galleta Oreo",u:"RODAJA",s:96.0},
     {n:"Gallo",u:"UNIDAD",s:3.0},
@@ -291,7 +291,7 @@ const INV_BASE={
     {n:"Dijon",u:"OZ",s:16.83},
     {n:"Fanta",u:"UNIDADES",s:11.0},
     {n:"Flan De Queso",u:"UNIDADES",s:5.0},
-    {n:"Fresas",u:"UNIDAD",s:80.0},
+    {n:"Fresas",u:"UNIDAD",s:80.0},{n:"Fresas Cocina",u:"OZ",s:0.0},
     {n:"Fresca",u:"UNIDADES",s:21.0},
     {n:"Galleta Oreo",u:"RODAJAS",s:56.0},
     {n:"Gallo",u:"UNIDADES",s:0.0},
@@ -452,11 +452,11 @@ const REC=[{p:"Latte Chai",i:"Café",c:20.0,u:"GR"},{p:"Mini Sandwichitos",i:"Ja
   
   
   
-  {p:"Crepa de Nutella Fresa",i:"Fresas",c:2.0,u:"OZ"},
+  {p:"Crepa de Nutella Fresa",i:"Fresas Cocina",c:2.0,u:"OZ"},
   
   {p:"Crepa de Nutella Fresa y Banano",i:"Banano",c:0.25,u:"UNIDAD"},
   
-  {p:"Crepa de Nutella Fresa y Banano",i:"Fresas",c:1.0,u:"OZ"},
+  {p:"Crepa de Nutella Fresa y Banano",i:"Fresas Cocina",c:1.0,u:"OZ"},
   
   {p:"Ensalada de Papa",i:"Ensalada de Papa",c:3.0,u:"OZ"},
   {p:"Espresso",i:"Café",c:20.0,u:"GR"},
@@ -835,11 +835,11 @@ const REC=[{p:"Latte Chai",i:"Café",c:20.0,u:"GR"},{p:"Mini Sandwichitos",i:"Ja
   {p:"Promo 2x1 Crepa de Nutella Banano",i:"Bola de Sorbete",c:6.0,u:"OZ"},
   {p:"Promo 2x1 Crepa de Nutella Banano",i:"Harina de Trigo",c:2.0,u:"CREPAS"},
   {p:"Promo 2x1 Crepa de Nutella Fresa",i:"Bola de Sorbete",c:6.0,u:"OZ"},
-  {p:"Promo 2x1 Crepa de Nutella Fresa",i:"Fresas",c:8.0,u:"OZ"},
+  {p:"Promo 2x1 Crepa de Nutella Fresa",i:"Fresas Cocina",c:8.0,u:"OZ"},
   {p:"Promo 2x1 Crepa de Nutella Fresa",i:"Harina de Trigo",c:2.0,u:"CREPAS"},
   {p:"Promo 2x1 Crepa de Nutella Fresa y Banano",i:"Banano",c:1.0,u:"UNIDAD"},
   {p:"Promo 2x1 Crepa de Nutella Fresa y Banano",i:"Bola de Sorbete",c:6.0,u:"OZ"},
-  {p:"Promo 2x1 Crepa de Nutella Fresa y Banano",i:"Fresas",c:4.0,u:"OZ"},
+  {p:"Promo 2x1 Crepa de Nutella Fresa y Banano",i:"Fresas Cocina",c:4.0,u:"OZ"},
   {p:"Promo 2x1 Crepa de Nutella Fresa y Banano",i:"Harina de Trigo",c:2.0,u:"CREPAS"},
   {p:"Flan Sin Sorbete",i:"Flan De Queso",c:1.0,u:"UNIDAD"},
   {p:"Cheesecake de Maracuya",i:"Cheese Cake De Maracuya",c:1.0,u:"UNIDAD"},
@@ -2240,10 +2240,11 @@ function renderRes(sc){
   dd.forEach(v=>{if(!porTipo[v.tipo])porTipo[v.tipo]={ef:0,tar:0,tr:0,tot:0};
     porTipo[v.tipo].ef+=v.efectivo||0;porTipo[v.tipo].tar+=v.tarjeta||0;
     porTipo[v.tipo].tr+=v.transferencia||0;porTipo[v.tipo].tot+=v.total||0;});
-  const totEf=r2(dd.reduce((s,v)=>s+(v.efectivo||0),0));
-  const totTar=r2(dd.reduce((s,v)=>s+(v.tarjeta||0),0));
-  const totTr=r2(dd.reduce((s,v)=>s+(v.transferencia||0),0));
-  const totB=r2(dd.reduce((s,v)=>s+(v.total||0),0));
+  const evFecha=(S.eventos||[]).filter(e=>e.fecha===fecha);
+  const totEf=r2(dd.reduce((s,v)=>s+(v.efectivo||0),0)+evFecha.reduce((s,e)=>s+(e.efectivo||0),0));
+  const totTar=r2(dd.reduce((s,v)=>s+(v.tarjeta||0),0)+evFecha.reduce((s,e)=>s+(e.tarjeta||0),0));
+  const totTr=r2(dd.reduce((s,v)=>s+(v.transferencia||0),0)+evFecha.reduce((s,e)=>s+(e.transferencia||0),0));
+  const totB=r2(dd.reduce((s,v)=>s+(v.total||0),0)+evFecha.reduce((s,e)=>s+(e.total||0),0));
   const porProd={};dd.forEach(v=>{porProd[v.producto]=(porProd[v.producto]||0)+v.cantidad;});
   const top=Object.entries(porProd).sort((a,b)=>b[1]-a[1]).slice(0,8);
   sc.innerHTML=`<div class="card">
@@ -2265,6 +2266,16 @@ function renderRes(sc){
         <span style="color:#2E7D52">Total eventos</span>
         <span style="color:#2E7D52">$${evDia.reduce((s,e)=>s+(e.total||0),0).toFixed(2)}</span>
       </div>
+    </div>`:"";
+  })()}
+  ${(()=>{const merDia=(S.mermas||[]).filter(m=>m.fecha===fecha);
+    return merDia.length>0?`<div class="card" style="border-left:4px solid #B7770D">
+      <div class="ct" style="color:#B7770D">📉 Mermas del día (${merDia.length})</div>
+      ${merDia.map(m=>`<div class="row">
+        <div style="flex:1"><div style="font-size:12px;font-weight:500">${m.item}</div>
+        <div style="font-size:11px;color:#7A6A5A">${m.motivo||""}</div></div>
+        <div style="font-weight:700;color:#B7770D">-${m.cant} ${(S.invBase||[]).find(i=>i.n===m.item)?.u||""}</div>
+      </div>`).join("")}
     </div>`:"";
   })()}
   ${(()=>{const ingDia=(S.ingresos||[]).filter(i=>i.fecha===fecha);
