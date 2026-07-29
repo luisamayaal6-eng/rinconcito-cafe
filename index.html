@@ -2509,19 +2509,22 @@ function renderInv(sc){
   `:""}
   ${sub==="ajustar"?`<div class="card">
     <div class="ct">✏️ Ajustar stock inicial por ítem</div>
-    <div style="font-size:12px;color:#7A6A5A;margin-bottom:10px">Modificá los valores y tocá <b>Confirmar</b> para guardar.</div>
-    ${(S.invBase||[]).map((item,idx)=>`<div class="row" style="gap:8px;flex-wrap:wrap">
-      <div style="flex:1;min-width:140px">
-        <div style="font-size:12px;font-weight:600">${item.n}</div>
-        <div style="font-size:11px;color:#7A6A5A">${item.u}</div>
-      </div>
-      <div style="display:flex;gap:6px;align-items:center">
-        <input class="inp" style="width:80px;text-align:right" type="text" inputmode="decimal"
-          value="${S.adjPending[idx]!==undefined?S.adjPending[idx]:item.s}"
-          oninput="S.adjPending[${idx}]=this.value">
-        <span style="font-size:11px;color:#7A6A5A;min-width:40px">${item.u}</span>
-      </div>
-    </div>`).join("")}
+    <div style="font-size:12px;color:#7A6A5A;margin-bottom:10px">Ingresá el stock <b>actual disponible</b> según tu conteo físico y tocá <b>Confirmar</b>.</div>
+    ${items.map((item,idx)=>{
+      const finVal=S.adjPending[idx]!==undefined?S.adjPending[idx]:item.fin;
+      return`<div class="row" style="gap:8px;flex-wrap:wrap">
+        <div style="flex:1;min-width:140px">
+          <div style="font-size:12px;font-weight:600">${item.n}</div>
+          <div style="font-size:11px;color:#7A6A5A">${item.u}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input class="inp" style="width:80px;text-align:right" type="text" inputmode="decimal"
+            value="${finVal}"
+            oninput="S.adjPending[${idx}]=this.value">
+          <span style="font-size:11px;color:#7A6A5A;min-width:40px">${item.u}</span>
+        </div>
+      </div>`;
+    }).join("")}
     <button class="btn gr" style="width:100%;justify-content:center;padding:11px;margin-top:12px" onclick="confirmarAdj()">✅ Confirmar cambios</button>
   </div>`:""}
   ${sub==="nuevo"?`<div class="card">
@@ -2591,8 +2594,26 @@ function addMerma(){
   S.merCant="";renderInv(el("sc"));
 }
 function confirmarAdj(){
+  // Build consumption/ingresos/mermas maps same as renderInv
+  const ALL_REC=[...REC.filter(r=>!S.recDeleted.some(d=>d.p===r.p&&d.i===r.i)),...S.recCustom];
+  const consumo={};
+  S.ventas.forEach(v=>{
+    if(v.cons&&typeof v.cons==="object"){Object.entries(v.cons).forEach(([k,amt])=>{consumo[k]=(consumo[k]||0)+(amt||0);});}
+    else{ALL_REC.filter(r=>r.p===v.producto).forEach(r=>{const k=norm(r.i);consumo[k]=(consumo[k]||0)+r.c*(v.cantidad||1);});}
+  });
+  const ingSum={};S.ingresos.forEach(i=>{const k=norm(i.item);ingSum[k]=(ingSum[k]||0)+i.cant;});
+  const merSum={};S.mermas.forEach(m=>{const k=norm(m.item);merSum[k]=(merSum[k]||0)+m.cant;});
+  // For each edited item, back-calculate the Ini so that: Ini + ing - cons - mer = enteredFinal
+  // => Ini = enteredFinal - ing + cons + mer
   Object.entries(S.adjPending).forEach(([idx,val])=>{
-    if(S.invBase[idx]!==undefined)S.invBase[idx].s=parseFloat(val)||0;
+    const item=S.invBase[idx];if(!item)return;
+    const enteredFinal=parseFloat(val);if(isNaN(enteredFinal))return;
+    const k=norm(item.n);
+    const cons=r2(consumo[k]||0);
+    const ing=r2(ingSum[k]||0);
+    const mer=r2(merSum[k]||0);
+    const newIni=r2(enteredFinal-ing+cons+mer);
+    item.s=Math.max(0,newIni);
   });
   S.adjPending={};
   saveInv();
