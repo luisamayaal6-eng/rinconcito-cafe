@@ -2454,9 +2454,9 @@ function renderInv(sc){
     <button class="btn sm bl" onclick="window._importCSV()">⬆ Importar</button>
   </div>
   ${sub==="stock"?`
-    ${neg.length>0?`<div class="card" style="border-left:4px solid #C0392B"><div class="ct" style="color:#C0392B">⚠ Stock negativo</div>${neg.map(sRow).join("")}</div>`:""}
-    ${bajo.length>0?`<div class="card" style="border-left:4px solid #B7770D"><div class="ct" style="color:#B7770D">⚠ Stock bajo</div>${bajo.map(sRow).join("")}</div>`:""}
-    <div class="card"><div class="ct">Todos — ${items.length} ingredientes</div>${ok.map(sRow).join("")}</div>
+    ${neg.length>0?`<div class="card" style="border-left:4px solid #C0392B"><div class="ct" style="color:#C0392B">⚠ Stock negativo (${neg.length})</div>${neg.map(sRow).join("")}</div>`:""}
+    ${bajo.length>0?`<div class="card" style="border-left:4px solid #B7770D"><div class="ct" style="color:#B7770D">⚠ Stock bajo (${bajo.length})</div>${bajo.map(sRow).join("")}</div>`:""}
+    <div class="card"><div class="ct">✅ Normal — ${ok.length} de ${items.length} ingredientes</div>${ok.map(sRow).join("")}</div>
   `:""}
   ${sub==="ingresos"?`<div class="card">
     <div class="ct">Registrar ingreso</div>
