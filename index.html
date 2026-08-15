@@ -1247,7 +1247,7 @@ const S={
   // Pago modal
   showPago:false,pagoModo:"simple",pagoMet:"Efectivo",pagoPY:"",pagoEf:"",pagoTar:"",pagoTr:"",
   // Inv sub-state
-  invSub:"stock",ingItem:"",ingCant:"",ingNota:"",merItem:"",merCant:"",merMot:"Desperdicio",
+  invSub:"stock",invSearch:"",ingItem:"",ingCant:"",ingNota:"",merItem:"",merCant:"",merMot:"Desperdicio",
   ingresos:[],mermas:[],cancelaciones:[],
   // Menu sub-state
   menuFilt:"",menuCat:"Todo",menuSel:null,showNewProd:false,newPN:"",newPP:"",newPC:"Cocina",
@@ -2458,16 +2458,22 @@ function renderInv(sc){
   const neg=items.filter(i=>i.fin<0);
   const bajo=items.filter(i=>i.fin>=0&&i.pct<20&&i.s>0);
   const ok=items.filter(i=>i.fin>=0&&(i.pct>=20||i.s===0));
+  const srch=(S.invSearch||"").toLowerCase().trim();
+  const filtrar=list=>srch?list.filter(i=>i.n.toLowerCase().includes(srch)):list;
   sc.innerHTML=`<div style="display:flex;gap:6px;margin-bottom:9px;flex-wrap:wrap">
     ${[["stock","📦 Stock"],["ingresos","➕ Ingresos"],["mermas","📉 Mermas"],["ajustar","✏️ Ajustar Stock"],["nuevo","🆕 Nuevo Ítem"]].map(([id,lb])=>
-      `<button class="chip${sub===id?" te":""}" onclick="S.invSub='${id}';renderInv(el('sc'))">${lb}</button>`).join("")}
+      `<button class="chip${sub===id?" te":""}" onclick="S.invSub='${id}';S.invSearch='';renderInv(el('sc'))">${lb}</button>`).join("")}
     <button class="btn sm" style="margin-left:auto" onclick="window._exportCSV()">⬇ CSV</button>
     <button class="btn sm bl" onclick="window._importCSV()">⬆ Importar</button>
   </div>
+  ${(sub==="stock"||sub==="ajustar")?`<div style="margin-bottom:8px">
+    <input class="inp" id="invSearchInp" placeholder="🔍 Buscar ingrediente..." value="${S.invSearch||""}"
+      oninput="filtrarInv(this.value)" style="width:100%">
+  </div>`:""}
   ${sub==="stock"?`
-    ${neg.length>0?`<div class="card" style="border-left:4px solid #C0392B"><div class="ct" style="color:#C0392B">⚠ Stock negativo (${neg.length})</div>${neg.map(sRow).join("")}</div>`:""}
-    ${bajo.length>0?`<div class="card" style="border-left:4px solid #B7770D"><div class="ct" style="color:#B7770D">⚠ Stock bajo (${bajo.length})</div>${bajo.map(sRow).join("")}</div>`:""}
-    <div class="card"><div class="ct">✅ Normal — ${ok.length} de ${items.length} ingredientes</div>${ok.map(sRow).join("")}</div>
+    ${filtrar(neg).length>0?`<div class="card" style="border-left:4px solid #C0392B"><div class="ct" style="color:#C0392B">⚠ Stock negativo (${filtrar(neg).length})</div>${filtrar(neg).map(i=>`<div class="inv-row" data-name="${i.n.toLowerCase()}">${sRow(i)}</div>`).join("")}</div>`:""}
+    ${filtrar(bajo).length>0?`<div class="card" style="border-left:4px solid #B7770D"><div class="ct" style="color:#B7770D">⚠ Stock bajo (${filtrar(bajo).length})</div>${filtrar(bajo).map(i=>`<div class="inv-row" data-name="${i.n.toLowerCase()}">${sRow(i)}</div>`).join("")}</div>`:""}
+    <div class="card"><div class="ct">${srch?`🔍 Resultados: ${filtrar(ok).length} ingredientes`:`✅ Normal — ${ok.length} de ${items.length} ingredientes`}</div>${filtrar(ok).map(i=>`<div class="inv-row" data-name="${i.n.toLowerCase()}">${sRow(i)}</div>`).join("")}</div>
   `:""}
   ${sub==="ingresos"?`<div class="card">
     <div class="ct">Registrar ingreso</div>
@@ -2521,9 +2527,10 @@ function renderInv(sc){
   ${sub==="ajustar"?`<div class="card">
     <div class="ct">✏️ Ajustar stock inicial por ítem</div>
     <div style="font-size:12px;color:#7A6A5A;margin-bottom:10px">Ingresá el stock <b>actual disponible</b> según tu conteo físico y tocá <b>Confirmar</b>.</div>
-    ${items.map((item,idx)=>{
-      const finVal=S.adjPending[idx]!==undefined?S.adjPending[idx]:item.fin;
-      return`<div class="row" style="gap:8px;flex-wrap:wrap">
+    ${filtrar(items).map((item,idx)=>{
+      const realIdx=items.indexOf(item);
+      const finVal=S.adjPending[realIdx]!==undefined?S.adjPending[realIdx]:item.fin;
+      return`<div class="inv-row" data-name="${item.n.toLowerCase()}" style="display:flex;gap:8px;flex-wrap:wrap;padding:6px 0;border-bottom:1px solid #F0EBE3">
         <div style="flex:1;min-width:140px">
           <div style="font-size:12px;font-weight:600">${item.n}</div>
           <div style="font-size:11px;color:#7A6A5A">${item.u}</div>
@@ -2531,7 +2538,7 @@ function renderInv(sc){
         <div style="display:flex;gap:6px;align-items:center">
           <input class="inp" style="width:80px;text-align:right" type="text" inputmode="decimal"
             value="${finVal}"
-            oninput="S.adjPending[${idx}]=this.value">
+            oninput="S.adjPending[${realIdx}]=this.value">
           <span style="font-size:11px;color:#7A6A5A;min-width:40px">${item.u}</span>
         </div>
       </div>`;
@@ -2635,6 +2642,14 @@ function adjStock(idx,val){
   if(!S.invBase)return;
   S.invBase[idx].s=parseFloat(val)||0;
   saveInv();
+}
+function filtrarInv(q){
+  S.invSearch=q;
+  const term=(q||'').toLowerCase().trim();
+  document.querySelectorAll('.inv-row').forEach(row=>{
+    const name=row.dataset.name||'';
+    row.style.display=!term||name.includes(term)?'':'none';
+  });
 }
 function importCSV(){
   const input=document.createElement('input');
