@@ -1694,46 +1694,31 @@ function pinKey(k){
   if(k==="⌫"){S.pinCur=S.pinCur.slice(0,-1);S.pinErr="";}
   else{
     const np=S.pinCur+k;
-    if(S.auth==="pin"){
-      if(S.pinStep===0){
-        S.pinCur=np;
-        if(np.length===4){S.pinConf=np;S.pinCur="";S.pinStep=1;}
-      }else{
-        S.pinCur=np;
-        if(np.length===4){
-          if(np===S.pinConf){ST_set("cafe-pin",np);S.auth="suc";S.pinCur="";S.pinStep=0;render();}
-          else{S.pinErr="PINs no coinciden";S.pinCur="";S.pinStep=0;S.pinConf="";}
-        }
-      }
-    }else if(S.auth==="lock"){
-      S.pinCur=np;
-      if(np.length===4){
-        Promise.all([
-          ST_get("cafe-pin-sdm","0604"),
-          ST_get("cafe-pin-cap","1512"),
-          ST_get("cafe-owner-pin","5566")
-        ]).then(async([pinSDM,pinCAP,own])=>{
-          const ownerPin=own||"5566";
-          if(np===ownerPin||np==="5566"){
-            S.pinCur="";S.auth="owner";render();
-          } else if(np===(pinSDM||"0604")){
-            // SDM PIN — go directly to Salvador del Mundo
-            S.pinCur="";S.auth="ok";S.suc="Salvador del Mundo";
-            ST_set("cafe-sucursal","Salvador del Mundo");
-            await loadSucData();render();
-          } else if(np===(pinCAP||"1512")){
-            // CAP PIN — go directly to Capistrano
-            S.pinCur="";S.auth="ok";S.suc="Capistrano";
-            ST_set("cafe-sucursal","Capistrano");
-            await loadSucData();render();
-          } else{S.pinErr="PIN incorrecto";S.pinCur="";}
-          if(S.pinErr) renderPin();
-        });
-        return;
-      }
+    S.pinCur=np;
+    if(np.length===4){
+      Promise.all([
+        ST_get("cafe-pin-sdm","0604"),
+        ST_get("cafe-pin-cap","1512"),
+        ST_get("cafe-owner-pin","5566")
+      ]).then(async([pinSDM,pinCAP,own])=>{
+        const ownerPin=own||"5566";
+        if(np===ownerPin||np==="5566"){
+          S.pinCur="";S.auth="owner";render();
+        } else if(np===(pinSDM||"0604")){
+          S.pinCur="";S.auth="ok";S.suc="Salvador del Mundo";
+          ST_set("cafe-sucursal","Salvador del Mundo");
+          await loadSucData();render();
+        } else if(np===(pinCAP||"1512")){
+          S.pinCur="";S.auth="ok";S.suc="Capistrano";
+          ST_set("cafe-sucursal","Capistrano");
+          await loadSucData();render();
+        } else{S.pinErr="PIN incorrecto";S.pinCur="";}
+        if(S.pinErr) renderPin();
+      });
+      return;
     }
   }
-  if(S.auth==="pin"||S.auth==="lock") renderPin();
+  renderPin();
 }
 
 // ── Sucursal Select ────────────────────────────────────────
@@ -3583,19 +3568,13 @@ async function init(){
     if(!capPin)await ST_set("cafe-pin-cap","1512");
   }catch{}
   try{
-    const[suc,cfg]=await Promise.all([
-      ST_get("cafe-sucursal",null),
-      ST_get("cafe-config",{empDesc:50})
-    ]);
+    const cfg=await ST_get("cafe-config",{empDesc:50});
     S.cfg=cfg;
-    if(suc){
-      S.suc=suc;
-      await loadSucData();
-    }
-    S.auth=pin?"lock":"pin";
+    // Always show PIN lock — branch is determined by which PIN the user enters
+    S.auth="lock";
     render();
   }catch(e){
-    S.auth="pin";render();
+    S.auth="lock";render();
   }
 }
 init();
