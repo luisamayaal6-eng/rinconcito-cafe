@@ -1708,15 +1708,25 @@ function pinKey(k){
     }else if(S.auth==="lock"){
       S.pinCur=np;
       if(np.length===4){
-        Promise.all([ST_get("cafe-pin",null),ST_get("cafe-owner-pin","9999")]).then(([emp,own])=>{
-          const ownerPin=own||"9999";
-          // Emergency code always grants owner access (hardcoded rescue)
-          if(np==="5566"||np===ownerPin){
-            if(np==="5566")ST_set("cafe-owner-pin","9999"); // auto-reset to 9999 when emergency is used
+        Promise.all([
+          ST_get("cafe-pin-sdm","0604"),
+          ST_get("cafe-pin-cap","1512"),
+          ST_get("cafe-owner-pin","5566")
+        ]).then(async([pinSDM,pinCAP,own])=>{
+          const ownerPin=own||"5566";
+          if(np===ownerPin||np==="5566"){
             S.pinCur="";S.auth="owner";render();
-          }
-          else if(np===emp){S.pinCur="";S.auth="ok";render();}
-          else{S.pinErr="PIN incorrecto";S.pinCur="";}
+          } else if(np===(pinSDM||"0604")){
+            // SDM PIN — go directly to Salvador del Mundo
+            S.pinCur="";S.auth="ok";S.suc="Salvador del Mundo";
+            ST_set("cafe-sucursal","Salvador del Mundo");
+            await loadSucData();render();
+          } else if(np===(pinCAP||"1512")){
+            // CAP PIN — go directly to Capistrano
+            S.pinCur="";S.auth="ok";S.suc="Capistrano";
+            ST_set("cafe-sucursal","Capistrano");
+            await loadSucData();render();
+          } else{S.pinErr="PIN incorrecto";S.pinCur="";}
           if(S.pinErr) renderPin();
         });
         return;
@@ -2926,15 +2936,21 @@ function renderCfg(sc){
     <div class="ct">🔒 Seguridad</div>
     <button class="btn sm" style="margin-bottom:10px" onclick="lockApp()">🔒 Bloquear ahora</button><br>
     ${S.pinChangeAuth?`
-    <label class="lbl">PIN empleados (4 dígitos)</label>
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <input class="inp" style="width:100px" type="password" maxlength="4" id="pinEmp" placeholder="••••">
-      <button class="btn gr sm" onclick="savePin('cafe-pin','pinEmp')">Guardar</button>
-    </div>
+    <div style="font-size:12px;color:#7A6A5A;margin-bottom:10px">Cambiá el PIN de cada sucursal o del dueño.</div>
     <label class="lbl">PIN dueño (dashboard completo)</label>
     <div style="display:flex;gap:8px;margin-bottom:10px">
       <input class="inp" style="width:100px" type="password" maxlength="4" id="pinOwn" placeholder="••••">
       <button class="btn gr sm" onclick="savePin('cafe-owner-pin','pinOwn')">Guardar</button>
+    </div>
+    <label class="lbl">PIN Salvador del Mundo (empleados)</label>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <input class="inp" style="width:100px" type="password" maxlength="4" id="pinSDM" placeholder="••••">
+      <button class="btn gr sm" onclick="savePin('cafe-pin-sdm','pinSDM')">Guardar</button>
+    </div>
+    <label class="lbl">PIN Capistrano (empleados)</label>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <input class="inp" style="width:100px" type="password" maxlength="4" id="pinCAP" placeholder="••••">
+      <button class="btn gr sm" onclick="savePin('cafe-pin-cap','pinCAP')">Guardar</button>
     </div>
     <button class="btn mu sm" onclick="S.pinChangeAuth=false;renderCfg(el('sc'))">🔒 Cerrar acceso PIN</button>
     `:`
@@ -3555,11 +3571,19 @@ async function ownerDelRecord(id){
 // ── App Init ───────────────────────────────────────────────
 async function init(){
   S.auth=null;render();
-  // One-time owner PIN reset: if firebase has a bad value, restore to 9999
-  try{const own=await ST_get("cafe-owner-pin",null);if(!own)await ST_set("cafe-owner-pin","9999");}catch{}
+  // Set default PINs if not yet configured
   try{
-    const[pin,suc,cfg]=await Promise.all([
-      ST_get("cafe-pin",null),
+    const[ownPin,sdmPin,capPin]=await Promise.all([
+      ST_get("cafe-owner-pin",null),
+      ST_get("cafe-pin-sdm",null),
+      ST_get("cafe-pin-cap",null)
+    ]);
+    if(!ownPin)await ST_set("cafe-owner-pin","5566");
+    if(!sdmPin)await ST_set("cafe-pin-sdm","0604");
+    if(!capPin)await ST_set("cafe-pin-cap","1512");
+  }catch{}
+  try{
+    const[suc,cfg]=await Promise.all([
       ST_get("cafe-sucursal",null),
       ST_get("cafe-config",{empDesc:50})
     ]);
