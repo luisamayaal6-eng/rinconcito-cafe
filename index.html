@@ -2899,7 +2899,6 @@ function renderCfg(sc){
   sc.innerHTML=`<div class="card">
     <div class="ct">Sucursal actual</div>
     <div style="font-size:15px;font-weight:700;margin-bottom:10px">☕ ${S.suc}</div>
-    <button class="btn sm" onclick="cambiarSuc()">Cambiar sucursal</button>
   </div>
   <div class="card">
     <div class="ct">Descuento empleados</div>
@@ -3085,7 +3084,7 @@ function printEventoRecibo(ev){
   window.print();
   document.body.removeChild(div);
 }
-function cambiarSuc(){S.suc=null;ST_set("cafe-sucursal",null);S.selMesa=null;render();}
+
 function lockApp(){S.auth="lock";S.pinCur="";S.pinErr="";render();}
 function savePin(key,inputId){const v=el(inputId)?.value;if(v&&v.length===4){ST_set(key,v);alert("PIN guardado ✓");}}
 async function verifyOwnerForPin(){
