@@ -2345,8 +2345,10 @@ function renderRes(sc){
       const cDia=(S.cancelaciones||[]).filter(c=>c.fecha===fecha);
       const totVentas=r2(ventasDia.reduce((s,v)=>s+(v.total||0),0));
       const totCanc=r2(cDia.reduce((s,c)=>s+(c.monto||0),0));
-      // Propina = 10% of Ventas total (the amount shown in "Por Tipo")
-      const totProp=r2(totVentas*0.10);
+      // totVentas ya incluye la propina (base × 1.10).
+      // Propina real = totVentas ÷ 11 (= base × 10% embedded)
+      // Base real = totVentas - propina
+      const totProp=r2(totVentas/11);
       const baseVentas=r2(totVentas-totProp);
       const subtotalSinProp=r2(totB-totProp);
       const neto=r2(totB-totProp-totCanc);
