@@ -2375,7 +2375,7 @@ function renderRes(sc){
     // Remesa = Efectivo cobrado - Propinas totales (se pagan en cash a empleados) - Facturas en efectivo
     const ventasDia=dd.filter(v=>v.tipo==="Ventas");
     const totVentas=r2(ventasDia.reduce((s,v)=>s+(v.total||0),0));
-    const totPropTotal=r2(totVentas*0.10);
+    const totPropTotal=r2(totVentas/11); // propina embedded = totVentas ÷ 11
     const cDia=(S.cancelaciones||[]).filter(c=>c.fecha===fecha);
     const cancEf=r2(cDia.filter(c=>c.metodo==="Efectivo").reduce((s,c)=>s+(c.monto||0),0));
     const remesa=r2(totEf-totPropTotal-cancEf);
