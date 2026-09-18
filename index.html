@@ -2221,25 +2221,30 @@ function buildTicketHTML(items,mesaNombre,mesaTipo,baseTotal,propMesa,descM,neto
   return`<div id="ticketPrint">${copies_html}</div>`;
 }
 function printTicket(mesaId,copies){
-  const mesa=S.mesas.find(m=>m.id===mesaId);if(!mesa)return;
-  const items=mesa.items||[];
-  const tot=r2(items.reduce((s,i)=>s+(i.total||0),0));
-  const propMesa=mesa.tipo==="Ventas"?r2(tot*0.10):0;
-  const descM=mesa.tipo==="Pedidos Ya"?(parseFloat(S.pagoPY)||0):0;
-  const neto=r2(tot+propMesa-descM);
-  // Build pagos from current payment state if modal is open, otherwise just show total
-  let pagos=[];
-  if(S.pagoModo==="simple"&&S.pagoMet)pagos=[{metodo:S.pagoMet,monto:neto}];
-  else if(S.pagoModo==="mixto"){
-    if(parseFloat(S.pagoEf)>0)pagos.push({metodo:"Efectivo",monto:parseFloat(S.pagoEf)});
-    if(parseFloat(S.pagoTar)>0)pagos.push({metodo:"Tarjeta",monto:parseFloat(S.pagoTar)});
-    if(parseFloat(S.pagoTr)>0)pagos.push({metodo:"Transferencia",monto:parseFloat(S.pagoTr)});
-  }
-  const div=document.createElement("div");
-  div.innerHTML=buildTicketHTML(items,mesa.nombre,mesa.tipo,tot,propMesa,descM,neto,pagos,S.suc,copies||S.ticketCopias||1);
-  document.body.appendChild(div);
-  window.print();
-  document.body.removeChild(div);
+  try{
+    const mesa=S.mesas.find(m=>m.id===mesaId);
+    if(!mesa||!mesa.items||mesa.items.length===0){alert("Sin ítems para imprimir");return;}
+    const items=mesa.items;
+    const tot=r2(items.reduce((s,i)=>s+(i.total||0),0));
+    const propMesa=mesa.tipo==="Ventas"?r2(tot*0.10):0;
+    const descM=mesa.tipo==="Pedidos Ya"?(parseFloat(S.pagoPY)||0):0;
+    const neto=r2(tot+propMesa-descM);
+    let pagos=[];
+    if(S.pagoModo==="simple"&&S.pagoMet)pagos=[{metodo:S.pagoMet,monto:neto}];
+    else if(S.pagoModo==="mixto"){
+      if(parseFloat(S.pagoEf)>0)pagos.push({metodo:"Efectivo",monto:parseFloat(S.pagoEf)});
+      if(parseFloat(S.pagoTar)>0)pagos.push({metodo:"Tarjeta",monto:parseFloat(S.pagoTar)});
+      if(parseFloat(S.pagoTr)>0)pagos.push({metodo:"Transferencia",monto:parseFloat(S.pagoTr)});
+    }
+    const div=document.createElement("div");
+    div.innerHTML=buildTicketHTML(items,mesa.nombre,mesa.tipo,tot,propMesa,descM,neto,pagos,S.suc,copies||S.ticketCopias||1);
+    document.body.appendChild(div);
+    // setTimeout lets browser render the div before printing
+    setTimeout(()=>{
+      window.print();
+      setTimeout(()=>document.body.removeChild(div),500);
+    },150);
+  }catch(err){alert("Error al imprimir: "+err.message);}
 }
 function printTicketFromEntries(entries,mesa,neto,pagos,copies){
   // Show e.sub (base price per item, no tip) so propina appears as separate line
@@ -2249,8 +2254,10 @@ function printTicketFromEntries(entries,mesa,neto,pagos,copies){
   const div=document.createElement("div");
   div.innerHTML=buildTicketHTML(items,mesa.nombre,mesa.tipo,tot,0,descM,neto,pagos,S.suc,copies||1);
   document.body.appendChild(div);
-  window.print();
-  document.body.removeChild(div);
+  setTimeout(()=>{
+    window.print();
+    setTimeout(()=>document.body.removeChild(div),500);
+  },150);
 }
 // ── Resumen View ───────────────────────────────────────────
 function renderRes(sc){
